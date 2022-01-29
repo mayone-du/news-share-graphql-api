@@ -11,20 +11,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// model User {
-//   id        BigInt   @id @default(autoincrement())
-//   username  String   @unique
-//   nickname  String
-//   email     String   @unique // @ignore とすると、clientでは参照されない
-//   role      Int      @default(0)
-//   status    Int      @default(0)
-////   roleNum     Int      @default(0) @map("role")
-////   statusNum   Int      @default(0) @map("status")
-//   createdAt DateTime @default(now())
-//   updatedAt DateTime @updatedAt
-//   posts     Post[]
-// }
-
 enum Role {
   ADMIN
   USER
@@ -33,6 +19,7 @@ enum Role {
 enum Status {
   ACTIVE
   INACTIVE
+  DELETED
 }
 
 model User {
@@ -42,18 +29,18 @@ model User {
   email     String   @unique // @ignore とすると、clientでは参照されない
   role      Role     @default(USER)
   status    Status   @default(ACTIVE)
+  // signInCount Int      @default(0)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  posts     Post[]
 }
 
-model Post {
+model News {
   id          BigInt   @id @default(autoincrement())
+  url         String // ニュースのURL
+  title       String // タイトル
+  description String // 概要
+  imageUrl    String // サムネ用の画像URL
+  nickname    String // 投稿者の名前
   createdAt   DateTime @default(now())
-  updatedAt   DateTime @default(now())
-  title       String
-  content     String
-  author      User     @relation(fields: [authorId], references: [id])
-  authorId    BigInt   @unique
-  isPublished Boolean  @default(false)
+  updatedAt   DateTime @updatedAt
 }
