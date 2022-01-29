@@ -1,0 +1,59 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+generator nexusPrisma {
+  provider = "nexus-prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// model User {
+//   id        BigInt   @id @default(autoincrement())
+//   username  String   @unique
+//   nickname  String
+//   email     String   @unique // @ignore とすると、clientでは参照されない
+//   role      Int      @default(0)
+//   status    Int      @default(0)
+////   roleNum     Int      @default(0) @map("role")
+////   statusNum   Int      @default(0) @map("status")
+//   createdAt DateTime @default(now())
+//   updatedAt DateTime @updatedAt
+//   posts     Post[]
+// }
+
+enum Role {
+  ADMIN
+  USER
+}
+
+enum Status {
+  ACTIVE
+  INACTIVE
+}
+
+model User {
+  id        BigInt   @id @default(autoincrement())
+  username  String   @unique
+  nickname  String
+  email     String   @unique // @ignore とすると、clientでは参照されない
+  role      Role     @default(USER)
+  status    Status   @default(ACTIVE)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  posts     Post[]
+}
+
+model Post {
+  id          BigInt   @id @default(autoincrement())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @default(now())
+  title       String
+  content     String
+  author      User     @relation(fields: [authorId], references: [id])
+  authorId    BigInt   @unique
+  isPublished Boolean  @default(false)
+}
