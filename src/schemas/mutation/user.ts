@@ -7,7 +7,7 @@ const createUserInput = inputObjectType({
   definition: (t) => {
     t.nonNull.string("username");
     t.nonNull.string("nickname");
-    t.nonNull.email("email");
+    t.nonNull.field("email", { type: "EmailAddress" });
     t.nonNull.field("role", { type: "Role" });
     t.nonNull.field("status", { type: "Status" });
   },
