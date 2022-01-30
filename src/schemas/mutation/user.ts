@@ -16,7 +16,7 @@ const createUserInput = inputObjectType({
 const updateUserInput = inputObjectType({
   name: "UpdateUserInput",
   definition: (t) => {
-    t.nonNull.string("email");
+    t.nonNull.email("email");
   },
 });
 

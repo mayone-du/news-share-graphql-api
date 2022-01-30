@@ -10,6 +10,7 @@ export const schema = makeSchema({
     asNexusMethod(GraphQLBigInt, "bigint", "bigint"),
     asNexusMethod(GraphQLDateTime, "datetime", "datetime"),
     asNexusMethod(GraphQLEmailAddress, "email", "email"),
+    // asNexusMethod(GraphQLURL, "url", "url"),
     GraphQLEnumType,
   ],
   outputs: {
