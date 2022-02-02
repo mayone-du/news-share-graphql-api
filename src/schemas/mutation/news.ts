@@ -14,7 +14,8 @@ const createNewsInput = inputObjectType({
 const updateNewsInput = inputObjectType({
   name: "UpdateNewsInput",
   definition: (t) => {
-    t.nonNull.id("id");
+    t.field(News.id);
+    t.nullable.string(News.url.name);
   },
 });
 
@@ -43,11 +44,14 @@ export const newsMutation = extendType({
       type: newsObject,
       args: { input: nonNull(arg({ type: updateNewsInput })) },
       resolve: async (_root, args, ctx) => {
+        // TODO: IDがBase64でencodeされてるのでbigintにdecode
+        const decodedId = args.input.id;
+        // urlがundefinedやnullの場合は更新せず、それ以外の場合は更新する
+        const url = args.input.url ?? undefined;
+
         return await ctx.prisma.news.update({
-          where: {},
-          data: {
-            ...args.input,
-          },
+          where: { id: decodedId },
+          data: { url },
         });
       },
     });
