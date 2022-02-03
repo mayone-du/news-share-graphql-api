@@ -29,5 +29,11 @@ export const schema = makeSchema({
       },
     ],
   },
-  plugins: [connectionPlugin()],
+  plugins: [
+    connectionPlugin({
+      extendConnection: {
+        totalCount: { type: "Int", requireResolver: false },
+      },
+    }),
+  ],
 });

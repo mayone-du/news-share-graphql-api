@@ -7,14 +7,14 @@ export const encodeId = (
   return Buffer.from(`${node}:${databaseId}`).toString("base64");
 };
 
-// export const decodeId = (id: string) => {
-//   try {
-//     const decodedId = Buffer.from(id, "base64").toString().split(":");
-//     return {
-//       id: BigInt(decodedId[1]),
-//       db: decodedId[0],
-//     };
-//   } catch {
-//     throw new Error("");
-//   }
-// };
+export const decodeId = (id: string) => {
+  try {
+    const decodedId = Buffer.from(id, "base64").toString().split(":");
+    return {
+      databaseId: BigInt(decodedId[1]),
+      nodeName: decodedId[0],
+    };
+  } catch {
+    throw new Error("Invalid id");
+  }
+};
