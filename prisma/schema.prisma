@@ -44,3 +44,10 @@ model News {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
+
+model SlackNotification {
+  id        BigInt   @id @default(autoincrement())
+  isSent    Boolean  @default(true) // Slackに送信したか
+  createdAt DateTime @default(now()) // 送信日時
+  updatedAt DateTime @updatedAt
+}
