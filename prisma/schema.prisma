@@ -43,6 +43,7 @@ model News {
   nickname    String // 投稿者の名前
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+  sharedAt    DateTime @default(now()) // シェアする日。
 }
 
 model SlackNotification {

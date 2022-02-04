@@ -1,6 +1,6 @@
 import { extendType } from "nexus";
 
-import { slackNotificationObject } from "../object/slackNotification";
+import { slackNotificationObject } from "../object";
 
 export const slackNotificationMutation = extendType({
   type: "Mutation",

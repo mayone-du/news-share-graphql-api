@@ -1,6 +1,7 @@
 import { arg, extendType, inputObjectType, nonNull } from "nexus";
 import { News } from "nexus-prisma";
 
+import { decodeId } from "../../util/convert";
 import { newsObject } from "../";
 
 const createNewsInput = inputObjectType({
@@ -14,8 +15,12 @@ const createNewsInput = inputObjectType({
 const updateNewsInput = inputObjectType({
   name: "UpdateNewsInput",
   definition: (t) => {
-    t.field(News.id);
+    t.nonNull.id(News.id.name);
     t.nullable.string(News.url.name);
+    t.nullable.string(News.title.name);
+    t.nullable.string(News.description.name);
+    t.nullable.string(News.nickname.name);
+    t.nullable.datetime(News.sharedAt.name);
   },
 });
 
@@ -44,14 +49,19 @@ export const newsMutation = extendType({
       type: newsObject,
       args: { input: nonNull(arg({ type: updateNewsInput })) },
       resolve: async (_root, args, ctx) => {
-        // TODO: IDがBase64でencodeされてるのでbigintにdecode
-        const decodedId = args.input.id;
+        const decodedId = decodeId(args.input.id).databaseId;
         // urlがundefinedやnullの場合は更新せず、それ以外の場合は更新する
-        const url = args.input.url ?? undefined;
+        const { input } = args;
 
         return await ctx.prisma.news.update({
           where: { id: decodedId },
-          data: { url },
+          data: {
+            url: input.url ?? undefined,
+            title: input.title ?? undefined,
+            description: input.description ?? undefined,
+            nickname: input.nickname ?? undefined,
+            sharedAt: input.sharedAt ?? undefined,
+          },
         });
       },
     });
