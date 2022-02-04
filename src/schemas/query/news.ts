@@ -25,7 +25,7 @@ export const newsQuery = extendType({
         const first = args.first ?? 0;
         return {
           edges: newsList.map((news) => {
-            return { node: news, cursor: news.id.toString() };
+            return { node: news, cursor: encodeId("News", news.id) };
           }),
           totalCount,
           pageInfo: {
