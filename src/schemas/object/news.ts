@@ -1,6 +1,8 @@
 import { objectType } from "nexus";
 import { News } from "nexus-prisma";
 
+import { encodeId } from "../../util/convert";
+
 export const newsObject = objectType({
   name: News.$name,
   description: News.$description,
@@ -14,5 +16,12 @@ export const newsObject = objectType({
     t.field(News.createdAt);
     t.field(News.updatedAt);
     t.field(News.sharedAt);
+
+    t.field("nodeId", {
+      type: "ID",
+      resolve(root, _args, _ctx) {
+        return encodeId("News", root.id);
+      },
+    });
   },
 });

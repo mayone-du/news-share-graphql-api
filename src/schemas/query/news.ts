@@ -8,15 +8,16 @@ import { sortOrder } from "../enum";
 import { newsObject } from "../object";
 
 export const newsQuery = extendType({
+  // TODO: nodeIdを受け取ってidを返すようにする
   type: "Query",
   definition(t) {
     t.field("news", {
       type: newsObject,
       args: {
-        id: "BigInt",
+        id: News.id.type,
       },
       resolve: async (_root, args, ctx, _info) => {
-        return await ctx.prisma.news.findFirst({ where: { id: Number(args.id) } });
+        return await ctx.prisma.news.findFirst({ where: { id: args.id } });
       },
     });
 
@@ -56,7 +57,10 @@ export const newsQuery = extendType({
         const first = args.first ?? 0;
         return {
           edges: newsList.map((news) => {
-            return { node: news, cursor: encodeId("News", news.id) };
+            return {
+              node: news,
+              cursor: encodeId("News", news.id),
+            };
           }),
           totalCount,
           pageInfo: {
