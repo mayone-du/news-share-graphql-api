@@ -1,5 +1,7 @@
+import dayjs from "dayjs";
 import { extendType } from "nexus";
 import { arg } from "nexus";
+import { News } from "nexus-prisma";
 
 import { encodeId } from "../../util/convert";
 import { sortOrder } from "../enum";
@@ -18,13 +20,23 @@ export const newsQuery = extendType({
       },
     });
 
-    t.nonNull.list.nonNull.field("todayNewsLit", {
+    t.nonNull.list.nonNull.field("newsList", {
       type: newsObject,
-      resolve: async (_root, _args, ctx, _info) => {
+      args: {
+        [News.sharedAt.name]: News.sharedAt.type,
+      },
+      resolve: async (_root, args, ctx, _info) => {
+        // JSTではなくUTCで扱っているため注意
+        const date = dayjs(dayjs(args.sharedAt).format("YYYY-MM-DD"));
+        const tomorrow = date.add(1, "day").toDate();
+        const yesterday = date.toDate();
+
+        // 指定された日付のニュースを取得して返す
         return await ctx.prisma.news.findMany({
           where: {
             sharedAt: {
-              gt: new Date(new Date().setHours(0, 0, 0, 0)),
+              gt: yesterday, // より上
+              lt: tomorrow, // より下
             },
           },
         });
