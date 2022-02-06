@@ -1,7 +1,7 @@
 import { arg, extendType, inputObjectType, nonNull } from "nexus";
 import { News } from "nexus-prisma";
 
-import { decodeId } from "../../util";
+import { decodeId, fetchMetaFields } from "../../util";
 import { newsObject } from "../";
 
 const createNewsInput = inputObjectType({
@@ -32,13 +32,11 @@ export const newsMutation = extendType({
       type: newsObject,
       args: { input: nonNull(arg({ type: createNewsInput })) },
       resolve: async (_root, args, ctx, _info) => {
+        const metaFields = fetchMetaFields(args.input.url);
         return await ctx.prisma.news.create({
-          // TODO: スクレイピング
           data: {
             ...args.input,
-            title: "",
-            description: "",
-            imageUrl: "",
+            ...metaFields,
           },
         });
       },

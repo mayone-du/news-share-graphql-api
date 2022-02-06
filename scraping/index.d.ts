@@ -9,4 +9,9 @@ export class ExternalObject<T> {
     [K: symbol]: T
   }
 }
-export function sum(a: number, b: number): number
+export interface MetaFields {
+  title: string
+  description: string
+  imageUrl: string
+}
+export function fetchMetaFields(url: string): MetaFields
