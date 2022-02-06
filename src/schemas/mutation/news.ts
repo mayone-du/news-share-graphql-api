@@ -1,7 +1,7 @@
 import { arg, extendType, inputObjectType, nonNull } from "nexus";
 import { News } from "nexus-prisma";
 
-import { decodeId } from "../../util/convert";
+import { decodeId } from "../../util";
 import { newsObject } from "../";
 
 const createNewsInput = inputObjectType({

@@ -3,7 +3,7 @@ import { extendType } from "nexus";
 import { arg } from "nexus";
 import { News } from "nexus-prisma";
 
-import { encodeId } from "../../util/convert";
+import { encodeId } from "../../util";
 import { sortOrder } from "../enum";
 import { newsObject } from "../object";
 

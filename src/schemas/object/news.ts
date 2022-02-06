@@ -1,7 +1,7 @@
 import { objectType } from "nexus";
 import { News } from "nexus-prisma";
 
-import { encodeId } from "../../util/convert";
+import { encodeId } from "../../util";
 
 export const newsObject = objectType({
   name: News.$name,
