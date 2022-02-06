@@ -4,11 +4,13 @@
   "license": "MIT",
   "scripts": {
     "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
-    "prisma-gen": "npx prisma generate",
-    "dev-migrate": "npx prisma migrate dev",
-    "prod-migrate": "npx prisma migrate prod"
+    "generate:prisma": "npx prisma generate",
+    "migrate:dev": "npx prisma migrate dev",
+    "migrate:prod": "npx prisma migrate prod",
+    "napi:new": "napi new scraping"
   },
   "dependencies": {
+    "@napi-rs/cli": "^2.4.2",
     "@prisma/client": "^3.4.2",
     "apollo-server": "^3.5.0",
     "dayjs": "^1.10.7",

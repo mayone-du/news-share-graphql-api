@@ -50,7 +50,7 @@ export const newsMutation = extendType({
       args: { input: nonNull(arg({ type: updateNewsInput })) },
       resolve: async (_root, args, ctx) => {
         const decodedId = decodeId(args.input.id).databaseId;
-        // urlがundefinedやnullの場合は更新せず、それ以外の場合は更新する
+        // undefinedやnullの場合は更新せず、それ以外の場合は更新する
         const { input } = args;
 
         return await ctx.prisma.news.update({

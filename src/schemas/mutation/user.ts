@@ -1,22 +1,24 @@
 import { arg, extendType, inputObjectType, nonNull } from "nexus";
+import { User } from "nexus-prisma";
 
 import { userObject } from "../";
 
 const createUserInput = inputObjectType({
   name: "CreateUserInput",
   definition: (t) => {
-    t.nonNull.string("username");
-    t.nonNull.string("nickname");
-    t.nonNull.field("email", { type: "EmailAddress" });
-    t.nonNull.field("role", { type: "Role" });
-    t.nonNull.field("status", { type: "Status" });
+    t.nonNull.field(User.username);
+    t.nonNull.field(User.nickname);
+    t.nonNull.field(User.email);
+    t.nonNull.field(User.role);
+    t.nonNull.field(User.status);
   },
 });
 
 const updateUserInput = inputObjectType({
   name: "UpdateUserInput",
   definition: (t) => {
-    t.nonNull.email("email");
+    t.nonNull.field(User.id);
+    t.nonNull.field(User.email);
   },
 });
 
@@ -28,11 +30,7 @@ export const userMutation = extendType({
       type: userObject,
       args: { input: nonNull(arg({ type: createUserInput })) },
       resolve: async (_root, args, ctx, _info) => {
-        return await ctx.prisma.user.create({
-          data: {
-            ...args.input,
-          },
-        });
+        return await ctx.prisma.user.create({ data: { ...args.input } });
       },
     });
 
@@ -42,12 +40,8 @@ export const userMutation = extendType({
       args: { input: nonNull(arg({ type: updateUserInput })) },
       resolve: async (_root, args, ctx) => {
         return await ctx.prisma.user.update({
-          where: {
-            email: args.input.email,
-          },
-          data: {
-            ...args.input,
-          },
+          where: { email: args.input.email },
+          data: { ...args.input },
         });
       },
     });
