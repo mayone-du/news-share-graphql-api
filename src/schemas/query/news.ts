@@ -17,7 +17,7 @@ export const newsQuery = extendType({
         id: News.id.type,
       },
       resolve: async (_root, args, ctx, _info) => {
-        return await ctx.prisma.news.findFirst({ where: { id: args.id } });
+        return await ctx.prisma.news.findUnique({ where: { id: args.id } });
       },
     });
 

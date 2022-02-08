@@ -18,11 +18,14 @@ const oAuth2Client = new OAuth2Client(
 export const context = async (ctx: ExpressContext): Promise<Context> => {
   const authorization = ctx.req.headers.authorization || "";
   // console.log(authorization);
-  // const tokenInfo = oAuth2Client.getTokenInfo(authorization);
-  // console.log("tokenInfo", tokenInfo);
+  if (!authorization) return { prisma, isAuthenticated: false };
+  try {
+    const tokenInfo = await oAuth2Client.getTokenInfo(authorization);
+    console.log("tokenInfo", tokenInfo);
+  } catch (e) {
+    console.error(e);
+    return { prisma, isAuthenticated: false };
+  }
 
-  // eslint-disable-next-line no-console
-  // console.log(tokenInfo);
-  // if (!tokenInfo) throw Error("No Token");
   return { prisma, isAuthenticated: false };
 };

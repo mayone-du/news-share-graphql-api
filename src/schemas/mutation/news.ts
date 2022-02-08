@@ -70,9 +70,8 @@ export const newsMutation = extendType({
       type: newsObject,
       args: { id: nonNull(arg({ type: News.id.type })) },
       resolve: async (_root, args, ctx, _info) => {
-        const decodedId = decodeId(args.id).databaseId;
         return await ctx.prisma.news.delete({
-          where: { id: decodedId },
+          where: { id: args.id },
         });
       },
     });
