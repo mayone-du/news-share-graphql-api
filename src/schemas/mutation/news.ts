@@ -32,6 +32,7 @@ export const newsMutation = extendType({
       type: newsObject,
       args: { input: nonNull(arg({ type: createNewsInput })) },
       resolve: async (_root, args, ctx, _info) => {
+        // TODO: urlのバリデーション
         const metaFields = fetchMetaFields(args.input.url);
         return await ctx.prisma.news.create({
           data: {
@@ -60,6 +61,18 @@ export const newsMutation = extendType({
             nickname: input.nickname ?? undefined,
             sharedAt: input.sharedAt ?? undefined,
           },
+        });
+      },
+    });
+
+    // delete
+    t.field("deleteNews", {
+      type: newsObject,
+      args: { id: nonNull(arg({ type: News.id.type })) },
+      resolve: async (_root, args, ctx, _info) => {
+        const decodedId = decodeId(args.id).databaseId;
+        return await ctx.prisma.news.delete({
+          where: { id: decodedId },
         });
       },
     });
