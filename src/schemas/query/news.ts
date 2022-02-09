@@ -55,21 +55,34 @@ export const newsQuery = extendType({
         const newsList = await ctx.prisma.news.findMany();
         const totalCount = await ctx.prisma.news.count();
         const first = args.first ?? 0;
-        return {
-          edges: newsList.map((news) => {
-            return {
-              node: news,
-              cursor: encodeId("News", news.id),
-            };
-          }),
-          totalCount,
-          pageInfo: {
-            hasNextPage: totalCount > first + newsList.length,
-            hasPreviousPage: false,
-            startCursor: encodeId("News", newsList[0].id),
-            endCursor: encodeId("News", newsList[newsList.length - 1].id),
-          },
-        };
+        if (newsList.length) {
+          return {
+            edges: newsList.map((news) => {
+              return {
+                node: news,
+                cursor: encodeId("News", news.id),
+              };
+            }),
+            totalCount,
+            pageInfo: {
+              hasNextPage: totalCount > first + newsList.length,
+              hasPreviousPage: false,
+              startCursor: encodeId("News", newsList[0].id),
+              endCursor: encodeId("News", newsList[newsList.length - 1].id),
+            },
+          };
+        } else {
+          return {
+            edges: [],
+            totalCount: 0,
+            pageInfo: {
+              hasNextPage: false,
+              hasPreviousPage: false,
+              startCursor: null,
+              endCursor: null,
+            },
+          };
+        }
       },
     });
   },

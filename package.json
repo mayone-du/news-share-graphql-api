@@ -5,12 +5,12 @@
   "scripts": {
     "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
     "generate:prisma": "npx prisma generate",
+    "studio:db": "npx prisma studio",
     "migrate:dev": "npx prisma migrate dev",
     "migrate:prod": "npx prisma migrate prod",
     "napi:new": "napi new scraping"
   },
   "dependencies": {
-    "@napi-rs/cli": "^2.4.2",
     "@prisma/client": "^3.4.2",
     "apollo-server": "^3.5.0",
     "dayjs": "^1.10.7",
@@ -20,6 +20,7 @@
   },
   "devDependencies": {
     "@types/node": "^16.11.7",
+    "@napi-rs/cli": "^2.4.2",
     "@typescript-eslint/eslint-plugin": "^5.3.1",
     "@typescript-eslint/parser": "^5.3.1",
     "eslint": "^8.2.0",
