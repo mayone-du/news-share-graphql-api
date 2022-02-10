@@ -43,11 +43,12 @@ export const newsMutation = extendType({
       },
     });
 
-    // update
+    // update 運営の人しか更新不可
     t.field("updateNews", {
       type: newsObject,
       args: { input: nonNull(arg({ type: updateNewsInput })) },
       resolve: async (_root, args, ctx) => {
+        if (!ctx.isAuthenticated) throw Error("This operation is not allowed");
         const decodedId = decodeId(args.input.id).databaseId;
         // undefinedやnullの場合は更新せず、それ以外の場合は更新する
         const { input } = args;
