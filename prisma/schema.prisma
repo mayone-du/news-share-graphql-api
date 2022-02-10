@@ -27,8 +27,8 @@ model User {
   username  String   @unique
   nickname  String
   email     String   @unique // @ignore とすると、clientでは参照されない
-  role      Role     @default(USER)
-  status    Status   @default(ACTIVE)
+  role      Role     @default(USER) // 作成時にメールアドレスをハードコードして判定して、ADMINとか切り替えるの良いかも
+  status    Status   @default(ACTIVE) // なんとなくつけただけ
   // signInCount Int      @default(0)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
