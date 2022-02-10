@@ -1,9 +1,9 @@
-import dayjs from "dayjs";
 import { extendType } from "nexus";
 import { arg } from "nexus";
 import { News } from "nexus-prisma";
 
 import { encodeId } from "../../util";
+import { getOneDayBetween } from "../../util/date";
 import { sortOrder } from "../enum";
 import { newsObject } from "../object";
 
@@ -28,10 +28,7 @@ export const newsQuery = extendType({
       },
       resolve: async (_root, args, ctx, _info) => {
         // JSTではなくUTCで扱っているため注意
-        const date = dayjs(dayjs(args.sharedAt).format("YYYY-MM-DD"));
-        const tomorrow = date.add(1, "day").toDate();
-        const yesterday = date.toDate();
-
+        const { yesterday, tomorrow } = getOneDayBetween(args.sharedAt); // TODO: argsに型がついてないの調べる
         // 指定された日付のニュースを取得して返す
         return await ctx.prisma.news.findMany({
           where: {

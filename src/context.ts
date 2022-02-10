@@ -23,7 +23,7 @@ export const context = async (ctx: ExpressContext): Promise<Context> => {
     const tokenInfo = await oAuth2Client.getTokenInfo(authorization);
     console.log("tokenInfo", tokenInfo);
   } catch (e) {
-    console.error(e);
+    // console.error(e);
     return { prisma, isAuthenticated: false };
   }
 
