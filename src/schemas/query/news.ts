@@ -1,4 +1,4 @@
-import { extendType } from "nexus";
+import { extendType, nullable } from "nexus";
 import { arg } from "nexus";
 import { News } from "nexus-prisma";
 
@@ -36,6 +36,22 @@ export const newsQuery = extendType({
               gt: yesterday, // より上
               lt: tomorrow, // より下
             },
+          },
+        });
+      },
+    });
+
+    t.nonNull.list.nonNull.field("searchNewsList", {
+      type: newsObject,
+      args: {
+        [News.title.name]: nullable(News.title.type.ofNexusType),
+        [News.description.name]: nullable(News.description.type.ofNexusType),
+      },
+      resolve: async (_root, args, ctx, _info) => {
+        return await ctx.prisma.news.findMany({
+          where: {
+            title: { search: args.title ?? undefined },
+            description: { search: args.description ?? undefined },
           },
         });
       },
