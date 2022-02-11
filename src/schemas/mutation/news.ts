@@ -15,12 +15,21 @@ const createNewsInput = inputObjectType({
 const updateNewsInput = inputObjectType({
   name: "UpdateNewsInput",
   definition: (t) => {
-    t.nonNull.id(News.id.name);
+    t.nonNull.id("nodeId");
     t.nullable.string(News.url.name);
     t.nullable.string(News.title.name);
     t.nullable.string(News.description.name);
     t.nullable.string(News.nickname.name);
     t.nullable.datetime(News.sharedAt.name);
+  },
+});
+
+const postponeNewsListInput = inputObjectType({
+  name: "PostponeNewsListInput",
+  definition: (t) => {
+    // nodeIdの配列を受け取る
+    t.nonNull.list.nonNull.id("nodeIds");
+    t.nonNull.datetime(News.sharedAt.name);
   },
 });
 
@@ -49,7 +58,7 @@ export const newsMutation = extendType({
       args: { input: nonNull(arg({ type: updateNewsInput })) },
       resolve: async (_root, args, ctx) => {
         if (!ctx.isAuthenticated) throw Error("This operation is not allowed");
-        const decodedId = decodeId(args.input.id).databaseId;
+        const decodedId = decodeId(args.input.nodeId).databaseId;
         // undefinedやnullの場合は更新せず、それ以外の場合は更新する
         const { input } = args;
 
@@ -66,10 +75,23 @@ export const newsMutation = extendType({
       },
     });
 
-    // t.field("postponeNewsList", {
-    //   type: newsObject,
-    // args: { input: nonNull(arg({ type: list })) },
-    // });
+    t.field("postponeNewsList", {
+      type: list(newsObject),
+      args: { input: nonNull(arg({ type: postponeNewsListInput })) },
+      resolve: async (root, args, ctx, _info) => {
+        const decodedIds = args.input.nodeIds.map((id) => {
+          return decodeId(id).databaseId;
+        });
+        await ctx.prisma.news.updateMany({
+          where: { id: { in: decodedIds } },
+          data: { sharedAt: args.input.sharedAt },
+        });
+        const updatedNewsList = await ctx.prisma.news.findMany({
+          where: { id: { in: decodedIds } },
+        });
+        return updatedNewsList;
+      },
+    });
 
     // delete
     t.field("deleteNews", {
