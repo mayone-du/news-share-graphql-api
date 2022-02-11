@@ -4,7 +4,6 @@ use scraper;
 #[macro_use]
 extern crate napi_derive;
 
-// #[derive(Debug)]
 #[napi(object)]
 pub struct MetaFields {
     pub title: String,

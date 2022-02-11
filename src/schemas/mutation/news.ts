@@ -1,4 +1,4 @@
-import { arg, extendType, inputObjectType, nonNull } from "nexus";
+import { arg, extendType, inputObjectType, list, nonNull } from "nexus";
 import { News } from "nexus-prisma";
 
 import { decodeId, fetchMetaFields } from "../../util";
@@ -66,11 +66,17 @@ export const newsMutation = extendType({
       },
     });
 
+    // t.field("postponeNewsList", {
+    //   type: newsObject,
+    // args: { input: nonNull(arg({ type: list })) },
+    // });
+
     // delete
     t.field("deleteNews", {
       type: newsObject,
       args: { id: nonNull(arg({ type: News.id.type })) },
       resolve: async (_root, args, ctx, _info) => {
+        if (!ctx.isAuthenticated) throw Error("This operation is not allowed");
         return await ctx.prisma.news.delete({
           where: { id: args.id },
         });

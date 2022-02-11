@@ -28,7 +28,7 @@ export const newsQuery = extendType({
       },
       resolve: async (_root, args, ctx, _info) => {
         // JSTではなくUTCで扱っているため注意
-        const { yesterday, tomorrow } = getOneDayBetween(args.sharedAt); // TODO: argsに型がついてないの調べる
+        const { yesterday, tomorrow } = getOneDayBetween(args.sharedAt);
         // 指定された日付のニュースを取得して返す
         return await ctx.prisma.news.findMany({
           where: {

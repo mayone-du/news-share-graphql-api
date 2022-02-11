@@ -1,5 +1,7 @@
 import { extendType } from "nexus";
 
+import { getOneDayBetween } from "../../util/date";
+import { handleSubmitSlack } from "../../util/slack";
 import { slackNotificationObject } from "../object";
 
 export const slackNotificationMutation = extendType({
@@ -10,7 +12,18 @@ export const slackNotificationMutation = extendType({
       type: slackNotificationObject,
       resolve: async (_root, _args, ctx, _info) => {
         if (!ctx.isAuthenticated) throw Error("This operation is not allowed");
-        return await ctx.prisma.slackNotification.create({ data: { isSent: true } });
+        const record = await ctx.prisma.slackNotification.create({ data: { isSent: true } });
+        const { yesterday, tomorrow } = getOneDayBetween(record.createdAt);
+
+        const todayNewsList = await ctx.prisma.news.findMany({
+          where: { sharedAt: { gt: yesterday, lt: tomorrow } },
+          orderBy: { sharedAt: "asc" },
+        });
+        const slackPayload = {};
+        // TODO: SlackのBlock Kitでいい感じに表示
+
+        record.isSent && (await handleSubmitSlack(slackPayload));
+        return record;
       },
     });
   },
