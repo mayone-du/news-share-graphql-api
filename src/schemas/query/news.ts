@@ -1,10 +1,8 @@
 import { extendType, nullable } from "nexus";
-import { arg } from "nexus";
 import { News } from "nexus-prisma";
 
 import { encodeId } from "../../util";
 import { getOneDayBetween } from "../../util/date";
-import { sortOrder } from "../enum";
 import { newsObject } from "../object";
 
 export const newsQuery = extendType({
@@ -37,6 +35,9 @@ export const newsQuery = extendType({
               lt: tomorrow, // より下
             },
           },
+          orderBy: {
+            createdAt: "asc",
+          },
         });
       },
     });
@@ -60,12 +61,9 @@ export const newsQuery = extendType({
     t.connectionField("allNews", {
       type: newsObject,
       // TODO: asc, desc
-      additionalArgs: {
-        orderBy: arg({ type: sortOrder, default: "asc" }),
-      },
       resolve: async (_root, args, ctx, _info) => {
         // TODO: hasNextPage, hasPreviousPageやカーソルのロジック考える or プラグインとか探す
-        const newsList = await ctx.prisma.news.findMany();
+        const newsList = await ctx.prisma.news.findMany({ orderBy: { createdAt: "desc" } });
         const totalCount = await ctx.prisma.news.count();
         const first = args.first ?? 0;
         if (newsList.length) {
