@@ -25,15 +25,16 @@ enum Status {
 }
 
 model User {
-  id        BigInt   @id @default(autoincrement())
-  username  String   @unique
-  nickname  String
-  email     String   @unique // @ignore とすると、clientでは参照されない
-  role      Role     @default(USER) // 作成時にメールアドレスをハードコードして判定して、ADMINとか切り替えるの良いかも
-  status    Status   @default(ACTIVE) // なんとなくつけただけ
-  // signInCount Int      @default(0)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id               BigInt   @id @default(autoincrement())
+  username         String   @unique
+  nickname         String
+  selfIntroduction String
+  email            String   @unique // @ignore とすると、clientでは参照されない
+  role             Role     @default(USER) // 作成時にメールアドレスをハードコードして判定して、ADMINとか切り替えるの良いかも
+  status           Status   @default(ACTIVE) // なんとなくつけただけ
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  Like             Like[]
 }
 
 model News {
@@ -41,12 +42,25 @@ model News {
   url         String // ニュースのURL
   title       String // タイトル
   description String // 概要
-  imageUrl    String // サムネ用の画像URL
+  imageUrl    String? // サムネ用の画像URL
   nickname    String // 投稿者の名前
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   sharedAt    DateTime @default(now()) // シェアする日。
   isViewed    Boolean  @default(false) // ニュースを読んだかどうか
+  isImportant Boolean  @default(false) // 重要なニュース(是非見てほしいニュース)かどうか
+  Like        Like[]
+}
+
+model Like {
+  id        BigInt   @id @default(autoincrement())
+  newsId    BigInt   @unique
+  news      News     @relation(fields: [newsId], references: [id])
+  userId    BigInt   @unique
+  User      User     @relation(fields: [userId], references: [id])
+  isLiked   Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model SlackNotification {
