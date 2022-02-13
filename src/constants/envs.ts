@@ -1,11 +1,27 @@
-/* eslint-disable @typescript-eslint/naming-convention */
-export const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
-export const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
-export const GOOGLE_REDIRECT_URL = process.env.GOOGLE_REDIRECT_URL;
-export const SLACK_API_ENDPOINT = process.env.SLACK_API_ENDPOINT;
+// production環境
+const SLACK_CLIENT_ID = process.env.SLACK_CLIENT_ID ?? "";
+const SLACK_CLIENT_SECRET = process.env.SLACK_CLIENT_SECRET ?? "";
+const SLACK_REDIRECT_URL = process.env.SLACK_REDIRECT_URL ?? "";
+const SLACK_SIGN_IN_SECRET = process.env.SLACK_SIGN_IN_SECRET ?? "";
+// const SLACK_API_ENDPOINT = process.env.SLACK_API_ENDPOINT ?? "";
 
-export const GOOGLE_ENV_VARS = {
-  GOOGLE_CLIENT_ID,
-  GOOGLE_CLIENT_SECRET,
-  GOOGLE_REDIRECT_URL,
+export const SLACK_ENV_VARS = {
+  SLACK_CLIENT_ID,
+  SLACK_CLIENT_SECRET,
+  SLACK_REDIRECT_URL,
+  SLACK_SIGN_IN_SECRET,
+} as const;
+
+// develop環境
+const DEV_SLACK_CLIENT_ID = process.env.DEV_SLACK_CLIENT_ID ?? "";
+const DEV_SLACK_CLIENT_SECRET = process.env.DEV_SLACK_CLIENT_SECRET ?? "";
+const DEV_SLACK_REDIRECT_URL = process.env.DEV_SLACK_REDIRECT_URL ?? "";
+const DEV_SLACK_SIGN_IN_SECRET = process.env.DEV_SLACK_SIGN_IN_SECRET ?? "";
+// const DEV_SLACK_API_ENDPOINT = process.env.DEV_SLACK_API_ENDPOINT ?? "";
+
+export const DEV_SLACK_ENV_VARS = {
+  DEV_SLACK_CLIENT_ID,
+  DEV_SLACK_CLIENT_SECRET,
+  DEV_SLACK_REDIRECT_URL,
+  DEV_SLACK_SIGN_IN_SECRET,
 } as const;

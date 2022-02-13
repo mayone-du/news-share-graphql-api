@@ -1,28 +1,32 @@
 import { PrismaClient } from "@prisma/client";
+import { WebClient } from "@slack/web-api";
 import type { ExpressContext } from "apollo-server-express";
-import { OAuth2Client } from "google-auth-library";
+import { verify } from "jsonwebtoken";
 
-import { GOOGLE_ENV_VARS } from "./constants/envs";
+import { DEV_SLACK_ENV_VARS } from "./constants/envs";
+
+const slackWebClient = new WebClient();
 
 export type Context = {
   prisma: PrismaClient;
   isAuthenticated: boolean;
 };
 
-// TODO: Slack OAuth2に変更
 const prisma = new PrismaClient();
-const oAuth2Client = new OAuth2Client(
-  GOOGLE_ENV_VARS.GOOGLE_CLIENT_ID,
-  GOOGLE_ENV_VARS.GOOGLE_CLIENT_SECRET,
-  GOOGLE_ENV_VARS.GOOGLE_REDIRECT_URL,
-);
+
 export const context = async (ctx: ExpressContext): Promise<Context> => {
+  console.log("call");
   const authorization = ctx.req.headers.authorization || "";
+
   // console.log(authorization);
-  if (!authorization) return { prisma, isAuthenticated: false };
+  // if (!authorization) return { prisma, isAuthenticated: false };
   try {
-    const tokenInfo = await oAuth2Client.getTokenInfo(authorization);
-    console.log("tokenInfo", tokenInfo);
+    const token = await verify(
+      authorization.replace("Bearer ", ""),
+      DEV_SLACK_ENV_VARS.DEV_SLACK_SIGN_IN_SECRET,
+    );
+    const result = slackWebClient.auth.test({ token });
+    console.log(result);
   } catch (e) {
     // console.error(e);
     return { prisma, isAuthenticated: false };

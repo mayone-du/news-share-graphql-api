@@ -1,9 +1,16 @@
-import { extendType, nullable } from "nexus";
+import { arg, extendType, inputObjectType, nonNull, nullable } from "nexus";
 import { News } from "nexus-prisma";
 
 import { encodeId } from "../../util";
 import { getOneDayBetween } from "../../util/date";
 import { newsObject } from "../object";
+
+const newsListInput = inputObjectType({
+  name: "NewsListInput",
+  definition(t) {
+    t.field(News.sharedAt);
+  },
+});
 
 export const newsQuery = extendType({
   // TODO: nodeIdを受け取ってidを返すようにする
@@ -21,12 +28,10 @@ export const newsQuery = extendType({
 
     t.nonNull.list.nonNull.field("newsList", {
       type: newsObject,
-      args: {
-        [News.sharedAt.name]: News.sharedAt.type,
-      },
+      args: { input: nonNull(arg({ type: newsListInput })) },
       resolve: async (_root, args, ctx, _info) => {
         // JSTではなくUTCで扱っているため注意
-        const { yesterday, tomorrow } = getOneDayBetween(args.sharedAt);
+        const { yesterday, tomorrow } = getOneDayBetween(args.input.sharedAt);
         // 指定された日付のニュースを取得して返す
         return await ctx.prisma.news.findMany({
           where: {

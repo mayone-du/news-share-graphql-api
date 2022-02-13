@@ -4,7 +4,10 @@ import { context } from "./context";
 import { schema } from "./schema";
 
 const server = new ApolloServer({
-  cors: true,
+  cors: {
+    origin: "*",
+    // credentials: true,
+  },
   schema,
   context,
 });
