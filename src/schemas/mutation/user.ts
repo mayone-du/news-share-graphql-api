@@ -30,6 +30,9 @@ export const userMutation = extendType({
       type: userObject,
       args: { input: nonNull(arg({ type: createUserInput })) },
       resolve: async (_root, args, ctx, _info) => {
+        if (!ctx.isAuthenticated) throw Error("Not Authenticated");
+        // https://api.slack.com/methods/users.profile.get
+        // ↑のAPIからSlackでのステータスを読んで、role enumを変更する
         return await ctx.prisma.user.create({ data: { ...args.input } });
       },
     });
@@ -39,6 +42,7 @@ export const userMutation = extendType({
       type: userObject,
       args: { input: nonNull(arg({ type: updateUserInput })) },
       resolve: async (_root, args, ctx) => {
+        // TODO: 自分の認証トークンからIDを割り出してそこから更新
         return await ctx.prisma.user.update({
           where: { email: args.input.email },
           data: { ...args.input },

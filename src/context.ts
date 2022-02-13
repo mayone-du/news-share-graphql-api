@@ -9,6 +9,7 @@ export type Context = {
   isAuthenticated: boolean;
 };
 
+// TODO: Slack OAuth2に変更
 const prisma = new PrismaClient();
 const oAuth2Client = new OAuth2Client(
   GOOGLE_ENV_VARS.GOOGLE_CLIENT_ID,

@@ -34,8 +34,19 @@ model User {
   status           Status   @default(ACTIVE) // なんとなくつけただけ
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
-  Like             Like[]
+  Likes            Like[]
+  // Shortcuts        Shortcut[]
 }
+
+// model Shortcut {
+//   id          BigInt   @id @default(autoincrement())
+//   name        String
+//   description String?
+//   createdAt   DateTime @default(now())
+//   updatedAt   DateTime @updatedAt
+//   userId      BigInt
+//   User        User     @relation(fields: [userId], references: [id])
+// }
 
 model News {
   id          BigInt   @id @default(autoincrement())
