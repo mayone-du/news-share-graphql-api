@@ -1,3 +1,4 @@
+import type { User } from "@prisma/client";
 import { PrismaClient } from "@prisma/client";
 import { WebClient } from "@slack/web-api";
 import type { ExpressContext } from "apollo-server-express";
@@ -9,7 +10,7 @@ const slackWebClient = new WebClient();
 
 export type Context = {
   prisma: PrismaClient;
-  isAuthenticated: boolean;
+  user?: Pick<User, "id">;
 };
 
 const prisma = new PrismaClient();
@@ -26,10 +27,9 @@ export const context = async (ctx: ExpressContext): Promise<Context> => {
     );
     const result = slackWebClient.auth.test({ token });
     console.log(result);
+    return { prisma, user: { id: 1n } };
   } catch (e) {
     // console.error(e);
-    return { prisma, isAuthenticated: false };
+    return { prisma };
   }
-
-  return { prisma, isAuthenticated: false };
 };

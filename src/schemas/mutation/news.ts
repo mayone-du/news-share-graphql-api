@@ -3,12 +3,12 @@ import { News } from "nexus-prisma";
 
 import { decodeId, fetchMetaFields } from "../../util";
 import { newsObject } from "../";
+import { unauthorized } from "../errors/messages";
 
 const createNewsInput = inputObjectType({
   name: "CreateNewsInput",
   definition: (t) => {
     t.field(News.url);
-    t.field(News.nickname);
   },
 });
 
@@ -19,7 +19,6 @@ const updateNewsInput = inputObjectType({
     t.nullable.string(News.url.name);
     t.nullable.string(News.title.name);
     t.nullable.string(News.description.name);
-    t.nullable.string(News.nickname.name);
     t.nullable.datetime(News.sharedAt.name);
   },
 });
@@ -41,12 +40,14 @@ export const newsMutation = extendType({
       type: newsObject,
       args: { input: nonNull(arg({ type: createNewsInput })) },
       resolve: async (_root, args, ctx, _info) => {
+        if (!ctx.user) throw Error(unauthorized);
         // TODO: urlのバリデーション
         const metaFields = fetchMetaFields(args.input.url);
         return await ctx.prisma.news.create({
           data: {
             ...args.input,
             ...metaFields,
+            userId: ctx.user.id,
           },
         });
       },
@@ -57,7 +58,7 @@ export const newsMutation = extendType({
       type: newsObject,
       args: { input: nonNull(arg({ type: updateNewsInput })) },
       resolve: async (_root, args, ctx) => {
-        if (!ctx.isAuthenticated) throw Error("This operation is not allowed");
+        if (!ctx.user) throw Error(unauthorized);
         const decodedId = decodeId(args.input.nodeId).databaseId;
         // undefinedやnullの場合は更新せず、それ以外の場合は更新する
         const { input } = args;
@@ -68,7 +69,6 @@ export const newsMutation = extendType({
             url: input.url ?? undefined,
             title: input.title ?? undefined,
             description: input.description ?? undefined,
-            nickname: input.nickname ?? undefined,
             sharedAt: input.sharedAt ?? undefined,
           },
         });
@@ -98,7 +98,7 @@ export const newsMutation = extendType({
       type: newsObject,
       args: { id: nonNull(arg({ type: News.id.type })) },
       resolve: async (_root, args, ctx, _info) => {
-        if (!ctx.isAuthenticated) throw Error("This operation is not allowed");
+        if (!ctx.user) throw Error(unauthorized);
         return await ctx.prisma.news.delete({
           where: { id: args.id },
         });
