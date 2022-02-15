@@ -1,6 +1,6 @@
-import { extendType } from "nexus";
-import { SlackNotification } from "nexus-prisma";
+import { arg, extendType, nonNull } from "nexus";
 
+// import { SlackNotification } from "nexus-prisma";
 import { getOneDayBetween } from "../../util/date";
 import { slackNotificationObject } from "../object";
 
@@ -10,7 +10,9 @@ export const slackNotificationQuery = extendType({
     t.field("slackNotification", {
       type: slackNotificationObject,
       args: {
-        id: SlackNotification.createdAt.type,
+        // createdAt: SlackNotification.createdAt.type,
+        // フロントのバグ(graphql-code-generator)のせいでDateTimeが引数に使えないため
+        createdAt: arg({ type: nonNull("String") }),
       },
       resolve: async (_root, args, ctx, _info) => {
         const { yesterday, tomorrow } = getOneDayBetween(args.createdAt); // TODO: argsに型がついてないの調べる

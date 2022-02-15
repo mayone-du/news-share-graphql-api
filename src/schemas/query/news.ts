@@ -8,7 +8,9 @@ import { newsObject } from "../object";
 const newsListInput = inputObjectType({
   name: "NewsListInput",
   definition(t) {
-    t.field(News.sharedAt);
+    // t.field(News.sharedAt);
+    // FIXME: 引数でDateTime型を受け取ると、フロントで無限ループのエラーになるため、StringでDate型を受け取り、パースして扱う
+    t.nonNull.string(News.sharedAt.name);
   },
 });
 
@@ -31,7 +33,9 @@ export const newsQuery = extendType({
       args: { input: nonNull(arg({ type: newsListInput })) },
       resolve: async (_root, args, ctx, _info) => {
         // JSTではなくUTCで扱っているため注意
-        const { yesterday, tomorrow } = getOneDayBetween(args.input.sharedAt);
+        const date = new Date(args.input.sharedAt);
+        const { yesterday, tomorrow } = getOneDayBetween(date);
+        // const { yesterday, tomorrow } = getOneDayBetween(args.input.sharedAt);
         // 指定された日付のニュースを取得して返す
         return await ctx.prisma.news.findMany({
           where: {
@@ -52,12 +56,14 @@ export const newsQuery = extendType({
       args: {
         [News.title.name]: nullable(News.title.type.ofNexusType),
         [News.description.name]: nullable(News.description.type.ofNexusType),
+        [News.url.name]: nullable(News.url.type.ofNexusType),
       },
       resolve: async (_root, args, ctx, _info) => {
         return await ctx.prisma.news.findMany({
           where: {
             title: { search: args.title ?? undefined },
             description: { search: args.description ?? undefined },
+            url: { search: args.url ?? undefined },
           },
         });
       },

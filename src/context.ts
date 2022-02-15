@@ -15,7 +15,6 @@ export type Context = {
 const prisma = new PrismaClient();
 
 export const context = async (ctx: ExpressContext): Promise<Context> => {
-  console.log("call");
   const authorization = ctx.req.headers.authorization || "";
 
   // console.log(authorization);
