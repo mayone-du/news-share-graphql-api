@@ -32,7 +32,7 @@ export const userMutation = extendType({
       type: userObject,
       args: { input: nonNull(arg({ type: createUserInput })) },
       resolve: async (_root, args, ctx, _info) => {
-        if (!ctx.user) throw Error(unauthorized);
+        // if (!ctx.user) throw Error(unauthorized);
         // https://api.slack.com/methods/users.profile.get
         // ↑のAPIからSlackでのステータスを読んで、role enumを変更する
         return await ctx.prisma.user.create({ data: { ...args.input } });

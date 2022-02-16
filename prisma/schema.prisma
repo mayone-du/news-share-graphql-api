@@ -34,8 +34,8 @@ model User {
   status           Status   @default(ACTIVE) // なんとなくつけただけ
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
-  Likes            Like[]
-  NewsList         News[]
+  likes            Like[]
+  newsList         News[]
   // Shortcuts        Shortcut[]
 }
 
@@ -60,8 +60,8 @@ model News {
   sharedAt    DateTime @default(now()) // シェアする日。
   isViewed    Boolean  @default(false) // ニュースを読んだかどうか
   isImportant Boolean  @default(false) // 重要なニュース(是非見てほしいニュース)かどうか
-  Like        Like[]
-  User        User     @relation(fields: [userId], references: [id])
+  like        Like[]
+  user        User     @relation(fields: [userId], references: [id])
   userId      BigInt
 }
 
@@ -70,7 +70,7 @@ model Like {
   newsId    BigInt   @unique
   news      News     @relation(fields: [newsId], references: [id])
   userId    BigInt   @unique
-  User      User     @relation(fields: [userId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
   isLiked   Boolean  @default(true)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

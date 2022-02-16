@@ -24,12 +24,13 @@ export const context = async (ctx: ExpressContext): Promise<Context> => {
     const token = await verify(
       authorization.replace("Bearer ", ""),
       DEV_SLACK_ENV_VARS.DEV_SLACK_SIGN_IN_SECRET,
-    );
+    ).toString();
     const result = slackWebClient.auth.test({ token });
     console.log(result);
     return { prisma, user: { id: 1n } };
   } catch (e) {
     // console.error(e);
+    console.error("error");
     return { prisma };
   }
 };

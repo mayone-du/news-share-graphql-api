@@ -40,14 +40,15 @@ export const newsMutation = extendType({
       type: newsObject,
       args: { input: nonNull(arg({ type: createNewsInput })) },
       resolve: async (_root, args, ctx, _info) => {
-        if (!ctx.user) throw Error(unauthorized);
+        // if (!ctx.user) throw Error(unauthorized);
         // TODO: urlのバリデーション
         const metaFields = fetchMetaFields(args.input.url);
         return await ctx.prisma.news.create({
           data: {
             ...args.input,
             ...metaFields,
-            userId: ctx.user.id,
+            // userId: ctx.user.id,
+            userId: 1n,
           },
         });
       },

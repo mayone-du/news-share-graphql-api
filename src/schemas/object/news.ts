@@ -15,6 +15,7 @@ export const newsObject = objectType({
     t.field(News.createdAt);
     t.field(News.updatedAt);
     t.field(News.sharedAt);
+    t.field(News.user);
 
     t.field("nodeId", {
       type: "ID",
