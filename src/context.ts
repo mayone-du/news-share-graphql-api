@@ -28,23 +28,11 @@ export const context = async (ctx: ExpressContext): Promise<Context> => {
     const user = await prisma.user.findUnique({
       where: { oauthUserId: authRes.ok ? authRes.user_id : "" },
     });
-    if (user)
-      return {
-        prisma,
-        userContext: {
-          isAuthenticated,
-          isInitialSignIn: false,
-          user,
-          slackAuthTestResponse: { user_id: authRes.user_id ?? "" },
-          token,
-        },
-      };
-    // ユーザーが存在しない場合は初回サインイン
     return {
       prisma,
       userContext: {
         isAuthenticated,
-        isInitialSignIn: true,
+        user,
         slackAuthTestResponse: { user_id: authRes.user_id ?? "" },
         token,
       },

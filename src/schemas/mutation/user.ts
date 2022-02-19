@@ -27,7 +27,8 @@ export const userMutation = extendType({
           ctx.userContext.token,
           ctx.userContext.slackAuthTestResponse.user_id ?? "",
         );
-        if (ctx.userContext.isInitialSignIn)
+        // 初回サインインの場合
+        if (!ctx.userContext.user)
           return await ctx.prisma.user.create({
             data: {
               oauthUserId: ctx.userContext.slackAuthTestResponse.user_id,
@@ -38,6 +39,7 @@ export const userMutation = extendType({
               role: slackUserStatus.profile?.status_emoji === CROWN_EMOJI ? "ADMIN" : "USER",
             },
           });
+
         // 初回ではない場合は、ユーザー情報を更新
         return await ctx.prisma.user.update({
           where: { oauthUserId: ctx.userContext.user.oauthUserId },
@@ -53,8 +55,7 @@ export const userMutation = extendType({
       type: userObject,
       args: { input: nonNull(arg({ type: updateUserInput })) },
       resolve: async (_root, args, ctx, _info) => {
-        if (!ctx.userContext.isAuthenticated) throw Error(unauthorized);
-        if (ctx.userContext.isInitialSignIn) throw Error(unauthorized);
+        if (!ctx.userContext.isAuthenticated || !ctx.userContext.user) throw Error(unauthorized);
         return await ctx.prisma.user.update({
           where: { oauthUserId: ctx.userContext.user.oauthUserId },
           data: {

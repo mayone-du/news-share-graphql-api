@@ -40,7 +40,7 @@ export const newsMutation = extendType({
       type: newsObject,
       args: { input: nonNull(arg({ type: createNewsInput })) },
       resolve: async (_root, args, ctx, _info) => {
-        // if (!ctx.user) throw Error(unauthorized);
+        if (!ctx.userContext.isAuthenticated || !ctx.userContext.user) throw Error(unauthorized);
         // TODO: urlのバリデーション
         // TODO: ogpが存在しない場合にtitleタグやdescriptionタグが取得できない
         const metaFields = fetchMetaFields(args.input.url);
@@ -48,8 +48,7 @@ export const newsMutation = extendType({
           data: {
             ...args.input,
             ...metaFields,
-            // userId: ctx.user.id,
-            userId: 1n,
+            userId: ctx.userContext.user.id,
           },
         });
       },
@@ -60,7 +59,7 @@ export const newsMutation = extendType({
       type: newsObject,
       args: { input: nonNull(arg({ type: updateNewsInput })) },
       resolve: async (_root, args, ctx) => {
-        if (!ctx.user) throw Error(unauthorized);
+        if (!ctx.userContext.isAuthenticated) throw Error(unauthorized);
         const decodedId = decodeId(args.input.nodeId).databaseId;
         // undefinedやnullの場合は更新せず、それ以外の場合は更新する
         const { input } = args;
@@ -100,7 +99,7 @@ export const newsMutation = extendType({
       type: newsObject,
       args: { id: nonNull(arg({ type: News.id.type })) },
       resolve: async (_root, args, ctx, _info) => {
-        if (!ctx.user) throw Error(unauthorized);
+        if (!ctx.userContext.isAuthenticated) throw Error(unauthorized);
         return await ctx.prisma.news.delete({
           where: { id: args.id },
         });
