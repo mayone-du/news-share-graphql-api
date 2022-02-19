@@ -1,14 +1,8 @@
 import { PrismaClient } from "@prisma/client";
-import { App as SlackApp } from "@slack/bolt";
-import type { ExpressContext } from "apollo-server-express";
+import type { ExpressContext } from "apollo-server/node_modules/apollo-server-express/src/ApolloServer";
 
-import { DEV_SLACK_ENV_VARS } from "./constants/envs";
+import { slackAuthTest } from "./feature/slack";
 import type { UserContext } from "./types";
-
-const slackApp = new SlackApp({
-  signingSecret: DEV_SLACK_ENV_VARS.DEV_SLACK_SIGN_IN_SECRET,
-  token: DEV_SLACK_ENV_VARS.DEV_SLACK_BOT_OAUTH_TOKEN,
-});
 
 export type Context = {
   prisma: PrismaClient;
@@ -24,12 +18,7 @@ export const context = async (ctx: ExpressContext): Promise<Context> => {
     const authorization = ctx.req.headers.authorization || "";
     if (!authorization) return { prisma, userContext: { isAuthenticated: false } }; // 認証情報がない場合
     const token = authorization.replace("Bearer ", "");
-    const authRes = await slackApp.client.auth.test({ token });
-    const slackUserStatus = await slackApp.client.users.profile.get({
-      token,
-      user: authRes.user_id,
-    });
-    // console.log(authRes, slackUserStatus);
+    const authRes = await slackAuthTest(token);
     // 認証情報が正しいか確認
     const isAuthenticated = authRes.ok;
     // 有効ではなかった場合
@@ -46,13 +35,19 @@ export const context = async (ctx: ExpressContext): Promise<Context> => {
           isAuthenticated,
           isInitialSignIn: false,
           user,
-          slackAuthTestResponse: authRes,
+          slackAuthTestResponse: { user_id: authRes.user_id ?? "" },
+          token,
         },
       };
     // ユーザーが存在しない場合は初回サインイン
     return {
       prisma,
-      userContext: { isAuthenticated, isInitialSignIn: true, slackAuthTestResponse: authRes },
+      userContext: {
+        isAuthenticated,
+        isInitialSignIn: true,
+        slackAuthTestResponse: { user_id: authRes.user_id ?? "" },
+        token,
+      },
     };
   } catch (e) {
     console.error(e);

@@ -1,24 +1,17 @@
 import { arg, extendType, inputObjectType, nonNull } from "nexus";
 import { User } from "nexus-prisma";
 
+import { CROWN_EMOJI } from "../../constants/statusEmoji";
+import { getSlackUserStatus } from "../../feature/slack";
 import { userObject } from "../";
 import { unauthorized } from "../errors/messages";
-
-const authUserInput = inputObjectType({
-  name: "AuthUserInput",
-  definition: (t) => {
-    t.nonNull.field(User.username);
-    t.nonNull.field(User.nickname);
-    t.nonNull.field(User.selfIntroduction);
-    t.nonNull.field(User.role);
-    t.nonNull.field(User.status);
-  },
-});
 
 const updateUserInput = inputObjectType({
   name: "UpdateUserInput",
   definition: (t) => {
     t.nonNull.field(User.id);
+    t.nullable.field(User.displayName);
+    t.nullable.field(User.selfIntroduction);
   },
 });
 
@@ -30,23 +23,45 @@ export const userMutation = extendType({
       resolve: async (_root, args, ctx, _info) => {
         if (!ctx.userContext.isAuthenticated) throw Error(unauthorized);
         // 認証済みだが、ユーザーが存在しない場合(初回ログインの場合)はユーザーを作成
+        const slackUserStatus = await getSlackUserStatus(
+          ctx.userContext.token,
+          ctx.userContext.slackAuthTestResponse.user_id ?? "",
+        );
         if (ctx.userContext.isInitialSignIn)
           return await ctx.prisma.user.create({
             data: {
               oauthUserId: ctx.userContext.slackAuthTestResponse.user_id,
-              // TODO: Slackのuser_idからユーザーのステータスを取得し、運営であるかなどを判断
+              username: slackUserStatus.profile?.email ?? "",
+              email: slackUserStatus.profile?.email ?? "",
+              displayName: slackUserStatus.profile?.display_name ?? "",
+              selfIntroduction: slackUserStatus.profile?.status_text ?? "",
+              role: slackUserStatus.profile?.status_emoji === CROWN_EMOJI ? "ADMIN" : "USER",
             },
           });
         // 初回ではない場合は、ユーザー情報を更新
         return await ctx.prisma.user.update({
           where: { oauthUserId: ctx.userContext.user.oauthUserId },
           data: {
-            username: "TODO:",
+            displayName: slackUserStatus.profile?.display_name ?? "",
+            signInCount: ctx.userContext.user.signInCount + 1,
           },
         });
+      },
+    });
 
-        // if (!ctx.user) throw Error(unauthorized);
-        return;
+    t.field("updateUser", {
+      type: userObject,
+      args: { input: nonNull(arg({ type: updateUserInput })) },
+      resolve: async (_root, args, ctx, _info) => {
+        if (!ctx.userContext.isAuthenticated) throw Error(unauthorized);
+        if (ctx.userContext.isInitialSignIn) throw Error(unauthorized);
+        return await ctx.prisma.user.update({
+          where: { oauthUserId: ctx.userContext.user.oauthUserId },
+          data: {
+            displayName: args.input.displayName ?? ctx.userContext.user.displayName,
+            selfIntroduction: args.input.selfIntroduction ?? ctx.userContext.user.selfIntroduction,
+          },
+        });
       },
     });
   },

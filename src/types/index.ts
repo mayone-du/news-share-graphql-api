@@ -6,7 +6,8 @@ import type { AuthTestResponse } from "@slack/web-api";
 export type UserContext =
   | ({
       isAuthenticated: true;
-      slackAuthTestResponse: Pick<AuthTestResponse, "user" | "user_id">;
+      slackAuthTestResponse: Required<Pick<AuthTestResponse, "user_id">>;
+      token: string;
     } & (
       | {
           isInitialSignIn: true;
@@ -20,13 +21,3 @@ export type UserContext =
       isAuthenticated: false;
       error?: Error | unknown;
     };
-
-// & (
-//       | {
-//           hasBearerToken: true;
-//           slackAuthTestResponse: SlackAuthTestErrorResponse;
-//         }
-//       | {
-//           hasBearerToken: false;
-//         }
-//     )

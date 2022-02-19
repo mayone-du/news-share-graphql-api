@@ -28,7 +28,7 @@ model User {
   id               BigInt   @id @default(autoincrement())
   oauthUserId      String   @unique
   username         String   @unique
-  nickname         String
+  displayName      String
   selfIntroduction String
   email            String   @unique // @ignoreとするとclient側で参照させないようにできる。が、バグがあるため使わない https://github.com/prisma/prisma/issues/11283
   role             Role     @default(USER)

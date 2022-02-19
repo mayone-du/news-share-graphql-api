@@ -18,7 +18,7 @@ export const userObject = objectType({
     t.field(User.id);
     t.field(User.oauthUserId);
     t.field(User.username);
-    t.field(User.nickname);
+    t.field(User.displayName);
     t.field(User.selfIntroduction);
     t.field(User.role.name, { type: roleEnum });
     t.field(User.status.name, { type: statusEnum });
