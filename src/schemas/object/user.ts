@@ -16,12 +16,15 @@ export const userObject = objectType({
   description: User.$description,
   definition: (t) => {
     t.field(User.id);
+    t.field(User.oauthUserId);
     t.field(User.username);
     t.field(User.nickname);
-    t.field(User.email);
+    t.field(User.selfIntroduction);
     t.field(User.role.name, { type: roleEnum });
     t.field(User.status.name, { type: statusEnum });
     t.field(User.createdAt);
     t.field(User.updatedAt);
+    // t.field(User.likes);
+    t.field(User.newsList);
   },
 });

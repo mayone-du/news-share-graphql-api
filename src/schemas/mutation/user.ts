@@ -4,13 +4,12 @@ import { User } from "nexus-prisma";
 import { userObject } from "../";
 import { unauthorized } from "../errors/messages";
 
-const createUserInput = inputObjectType({
-  name: "CreateUserInput",
+const authUserInput = inputObjectType({
+  name: "AuthUserInput",
   definition: (t) => {
     t.nonNull.field(User.username);
     t.nonNull.field(User.nickname);
     t.nonNull.field(User.selfIntroduction);
-    t.nonNull.field(User.email);
     t.nonNull.field(User.role);
     t.nonNull.field(User.status);
   },
@@ -20,35 +19,34 @@ const updateUserInput = inputObjectType({
   name: "UpdateUserInput",
   definition: (t) => {
     t.nonNull.field(User.id);
-    t.nonNull.field(User.email);
   },
 });
 
 export const userMutation = extendType({
   type: "Mutation",
   definition: (t) => {
-    // create
-    t.field("createUser", {
+    t.field("authUser", {
       type: userObject,
-      args: { input: nonNull(arg({ type: createUserInput })) },
       resolve: async (_root, args, ctx, _info) => {
-        // if (!ctx.user) throw Error(unauthorized);
-        // https://api.slack.com/methods/users.profile.get
-        // ↑のAPIからSlackでのステータスを読んで、role enumを変更する
-        return await ctx.prisma.user.create({ data: { ...args.input } });
-      },
-    });
-
-    // update
-    t.field("updateUser", {
-      type: userObject,
-      args: { input: nonNull(arg({ type: updateUserInput })) },
-      resolve: async (_root, args, ctx) => {
-        // TODO: 自分の認証トークンからIDを割り出してそこから更新
+        if (!ctx.userContext.isAuthenticated) throw Error(unauthorized);
+        // 認証済みだが、ユーザーが存在しない場合(初回ログインの場合)はユーザーを作成
+        if (ctx.userContext.isInitialSignIn)
+          return await ctx.prisma.user.create({
+            data: {
+              oauthUserId: ctx.userContext.slackAuthTestResponse.user_id,
+              // TODO: Slackのuser_idからユーザーのステータスを取得し、運営であるかなどを判断
+            },
+          });
+        // 初回ではない場合は、ユーザー情報を更新
         return await ctx.prisma.user.update({
-          where: { email: args.input.email },
-          data: { ...args.input },
+          where: { oauthUserId: ctx.userContext.user.oauthUserId },
+          data: {
+            username: "TODO:",
+          },
         });
+
+        // if (!ctx.user) throw Error(unauthorized);
+        return;
       },
     });
   },

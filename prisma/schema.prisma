@@ -26,17 +26,19 @@ enum Status {
 
 model User {
   id               BigInt   @id @default(autoincrement())
+  oauthUserId      String   @unique
   username         String   @unique
   nickname         String
   selfIntroduction String
-  email            String   @unique // @ignore とすると、clientでは参照されない
-  role             Role     @default(USER) // 作成時にメールアドレスをハードコードして判定して、ADMINとか切り替えるの良いかも
+  email            String   @unique // @ignoreとするとclient側で参照させないようにできる。が、バグがあるため使わない https://github.com/prisma/prisma/issues/11283
+  role             Role     @default(USER)
   status           Status   @default(ACTIVE) // なんとなくつけただけ
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
+  signInCount      Int      @default(0)
   likes            Like[]
   newsList         News[]
-  // Shortcuts        Shortcut[]
+  // shortcuts        Shortcut[]
 }
 
 // model Shortcut {

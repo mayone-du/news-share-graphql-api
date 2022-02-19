@@ -42,6 +42,7 @@ export const newsMutation = extendType({
       resolve: async (_root, args, ctx, _info) => {
         // if (!ctx.user) throw Error(unauthorized);
         // TODO: urlのバリデーション
+        // TODO: ogpが存在しない場合にtitleタグやdescriptionタグが取得できない
         const metaFields = fetchMetaFields(args.input.url);
         return await ctx.prisma.news.create({
           data: {

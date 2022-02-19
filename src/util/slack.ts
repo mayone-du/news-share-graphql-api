@@ -1,6 +1,7 @@
 import fetch from "node-fetch";
 
-import { SLACK_API_ENDPOINT } from "../constants/envs";
+// TODO: axiosに乗り換えと、boltとか使うかも
+// import { SLACK_API_ENDPOINT } from "../constants/envs";
 
 export const handleSubmitSlack = async (payload: object) => {
   try {
