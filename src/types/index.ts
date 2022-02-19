@@ -1,28 +1,12 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 
 import type { User } from "@prisma/client";
-
-type SlackAuthTestSuccessResponse = {
-  ok: true;
-  url: string;
-  team: string;
-  team_id: string;
-  user: string;
-  user_id: string;
-  is_enterprise_install: boolean;
-};
-
-type SlackAuthTestErrorResponse = {
-  ok: false;
-  error: string;
-};
-
-export type SlackAuthTestResponse = SlackAuthTestSuccessResponse | SlackAuthTestErrorResponse;
+import type { AuthTestResponse } from "@slack/web-api";
 
 export type UserContext =
   | ({
       isAuthenticated: true;
-      slackAuthTestResponse: Pick<SlackAuthTestSuccessResponse, "user" | "user_id">;
+      slackAuthTestResponse: Pick<AuthTestResponse, "user" | "user_id">;
     } & (
       | {
           isInitialSignIn: true;
@@ -34,6 +18,15 @@ export type UserContext =
     ))
   | {
       isAuthenticated: false;
-      slackAuthTestResponse: SlackAuthTestErrorResponse;
       error?: Error | unknown;
     };
+
+// & (
+//       | {
+//           hasBearerToken: true;
+//           slackAuthTestResponse: SlackAuthTestErrorResponse;
+//         }
+//       | {
+//           hasBearerToken: false;
+//         }
+//     )

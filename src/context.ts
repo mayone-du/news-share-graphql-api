@@ -1,22 +1,14 @@
 import { PrismaClient } from "@prisma/client";
-// import { InstallProvider } from "@slack/oauth";
-// import { WebClient } from "@slack/web-api";
+import { App as SlackApp } from "@slack/bolt";
 import type { ExpressContext } from "apollo-server-express";
-import axios from "axios";
 
-import type { SlackAuthTestResponse, UserContext } from "./types";
+import { DEV_SLACK_ENV_VARS } from "./constants/envs";
+import type { UserContext } from "./types";
 
-// import { verify } from "jsonwebtoken";
-
-// import { DEV_SLACK_ENV_VARS } from "./constants/envs";
-
-// const installer = new InstallProvider({
-//   clientId: DEV_SLACK_ENV_VARS.DEV_SLACK_CLIENT_ID,
-//   clientSecret: DEV_SLACK_ENV_VARS.DEV_SLACK_CLIENT_SECRET,
-// });
-// const slackWebClient = new WebClient();
-
-const SLACK_AUTH_TEST_URL = "https://slack.com/api/auth.test";
+const slackApp = new SlackApp({
+  signingSecret: DEV_SLACK_ENV_VARS.DEV_SLACK_SIGN_IN_SECRET,
+  token: DEV_SLACK_ENV_VARS.DEV_SLACK_BOT_OAUTH_TOKEN,
+});
 
 export type Context = {
   prisma: PrismaClient;
@@ -31,27 +23,37 @@ export const context = async (ctx: ExpressContext): Promise<Context> => {
   try {
     const authorization = ctx.req.headers.authorization || "";
     if (!authorization) return { prisma, userContext: { isAuthenticated: false } }; // 認証情報がない場合
-    const res = await axios.post<SlackAuthTestResponse>(SLACK_AUTH_TEST_URL, undefined, {
-      headers: {
-        // eslint-disable-next-line @typescript-eslint/naming-convention
-        "Content-Type": "application/json",
-        // eslint-disable-next-line @typescript-eslint/naming-convention
-        Authorization: authorization,
-      },
+    const token = authorization.replace("Bearer ", "");
+    const authRes = await slackApp.client.auth.test({ token });
+    const slackUserStatus = await slackApp.client.users.profile.get({
+      token,
+      user: authRes.user_id,
     });
+    // console.log(authRes, slackUserStatus);
     // 認証情報が正しいか確認
-    const isAuthenticated = res.data.ok;
+    const isAuthenticated = authRes.ok;
     // 有効ではなかった場合
-    if (!isAuthenticated)
-      return { prisma, userContext: { isAuthenticated, error: res.data.error } };
+    if (!isAuthenticated) return { prisma, userContext: { isAuthenticated, error: authRes.error } };
 
     // 有効だった場合
     const user = await prisma.user.findUnique({
-      where: { oauthUserId: res.data.ok ? res.data.user_id : "" },
+      where: { oauthUserId: authRes.ok ? authRes.user_id : "" },
     });
+    if (user)
+      return {
+        prisma,
+        userContext: {
+          isAuthenticated,
+          isInitialSignIn: false,
+          user,
+          slackAuthTestResponse: authRes,
+        },
+      };
     // ユーザーが存在しない場合は初回サインイン
-    if (user) return { prisma, userContext: { isAuthenticated, isInitialSignIn: false, user } };
-    return { prisma, userContext: { isAuthenticated, isInitialSignIn: true } };
+    return {
+      prisma,
+      userContext: { isAuthenticated, isInitialSignIn: true, slackAuthTestResponse: authRes },
+    };
   } catch (e) {
     console.error(e);
     return { prisma, userContext: { isAuthenticated: false, error: e } };

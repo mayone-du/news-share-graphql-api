@@ -13,9 +13,10 @@
   },
   "dependencies": {
     "@prisma/client": "^3.4.2",
+    "@slack/bolt": "^3.9.0",
     "apollo-server": "^3.5.0",
-    "axios": "^0.26.0",
     "dayjs": "^1.10.7",
+    "dotenv": "^16.0.0",
     "graphql": "^15.7.2",
     "graphql-scalars": "^1.13.1"
   },
