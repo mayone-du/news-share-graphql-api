@@ -37,6 +37,7 @@ export const userMutation = extendType({
               displayName: slackUserStatus.profile?.display_name ?? "",
               selfIntroduction: slackUserStatus.profile?.status_text ?? "",
               role: slackUserStatus.profile?.status_emoji === CROWN_EMOJI ? "ADMIN" : "USER",
+              photoUrl: slackUserStatus.profile?.image_72 ?? "",
             },
           });
 

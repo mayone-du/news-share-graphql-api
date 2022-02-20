@@ -20,6 +20,7 @@ export const userObject = objectType({
     t.field(User.username);
     t.field(User.displayName);
     t.field(User.selfIntroduction);
+    t.field(User.photoUrl);
     t.field(User.role.name, { type: roleEnum });
     t.field(User.status.name, { type: statusEnum });
     t.field(User.createdAt);

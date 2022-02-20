@@ -30,6 +30,7 @@ model User {
   username         String   @unique
   displayName      String
   selfIntroduction String
+  photoUrl         String
   email            String   @unique // @ignoreとするとclient側で参照させないようにできる。が、バグがあるため使わない https://github.com/prisma/prisma/issues/11283
   role             Role     @default(USER)
   status           Status   @default(ACTIVE) // なんとなくつけただけ
