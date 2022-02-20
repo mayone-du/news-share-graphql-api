@@ -7,6 +7,7 @@ const slackApp = new SlackApp({
   token: DEV_SLACK_ENV_VARS.DEV_SLACK_BOT_OAUTH_TOKEN,
 });
 
+// Slack認証情報の検証
 export const slackAuthTest = async (token: string) => {
   const authTestResponse = await slackApp.client.auth.test({
     token,
@@ -14,10 +15,17 @@ export const slackAuthTest = async (token: string) => {
   return authTestResponse;
 };
 
+// Slackプロフィールのステータスを取得する
 export const getSlackUserStatus = async (token: string, slackUserId: string) => {
   const slackUserStatus = await slackApp.client.users.profile.get({
     token,
     user: slackUserId,
   });
   return slackUserStatus;
+};
+
+// Slackにニュースを投稿
+export const postNewsListToSlack = async () => {
+  // const res = slackApp.client.chat.postMessage({})
+  return;
 };

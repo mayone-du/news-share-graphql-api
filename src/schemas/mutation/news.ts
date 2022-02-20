@@ -32,6 +32,13 @@ const postponeNewsListInput = inputObjectType({
   },
 });
 
+const deleteNewsInput = inputObjectType({
+  name: "DeleteNewsInput",
+  definition: (t) => {
+    t.nonNull.id("nodeId");
+  },
+});
+
 export const newsMutation = extendType({
   type: "Mutation",
   definition: (t) => {
@@ -58,12 +65,19 @@ export const newsMutation = extendType({
     t.field("updateNews", {
       type: newsObject,
       args: { input: nonNull(arg({ type: updateNewsInput })) },
-      resolve: async (_root, args, ctx) => {
-        if (!ctx.userContext.isAuthenticated) throw Error(unauthorized);
+      resolve: async (_root, args, ctx, _info) => {
+        if (!ctx.userContext.isAuthenticated || !ctx.userContext.user) throw Error(unauthorized);
         const decodedId = decodeId(args.input.nodeId).databaseId;
+        // 自分のニュースかチェック
+        const news = await ctx.prisma.news.findUnique({
+          where: { id: decodedId },
+        });
+        // リクエストを送ったユーザーとニュースの作成者が違い、かつ、運営や開発者でない場合はエラー
+        if (ctx.userContext.user.id !== news?.userId && ctx.userContext.user.role === "USER")
+          throw Error(unauthorized);
         // undefinedやnullの場合は更新せず、それ以外の場合は更新する
         const { input } = args;
-
+        // ニュースの作成者と運営のみ編集可能
         return await ctx.prisma.news.update({
           where: { id: decodedId },
           data: {
@@ -76,10 +90,11 @@ export const newsMutation = extendType({
       },
     });
 
+    // ニュースを一括延期
     t.field("postponeNewsList", {
       type: list(newsObject),
       args: { input: nonNull(arg({ type: postponeNewsListInput })) },
-      resolve: async (root, args, ctx, _info) => {
+      resolve: async (_root, args, ctx, _info) => {
         const decodedIds = args.input.nodeIds.map((id) => {
           return decodeId(id).databaseId;
         });
@@ -97,11 +112,20 @@ export const newsMutation = extendType({
     // delete
     t.field("deleteNews", {
       type: newsObject,
-      args: { id: nonNull(arg({ type: News.id.type })) },
+      args: { input: nonNull(arg({ type: deleteNewsInput })) },
       resolve: async (_root, args, ctx, _info) => {
-        if (!ctx.userContext.isAuthenticated) throw Error(unauthorized);
+        if (!ctx.userContext.isAuthenticated || !ctx.userContext.user) throw Error(unauthorized);
+        const decodedId = decodeId(args.input.nodeId).databaseId;
+        // 自分のニュースかチェック
+        const news = await ctx.prisma.news.findUnique({
+          where: { id: decodedId },
+        });
+        // リクエストを送ったユーザーとニュースの作成者が違い、かつ、運営や開発者でない場合はエラー
+        if (ctx.userContext.user.id !== news?.userId && ctx.userContext.user.role === "USER")
+          throw Error(unauthorized);
+
         return await ctx.prisma.news.delete({
-          where: { id: args.id },
+          where: { id: decodedId },
         });
       },
     });
