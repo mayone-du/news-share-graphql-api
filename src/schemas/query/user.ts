@@ -1,5 +1,6 @@
 import { extendType } from "nexus";
 
+import { unauthorized } from "../errors/messages";
 import { userObject } from "../object";
 
 export const userQuery = extendType({
@@ -12,6 +13,14 @@ export const userQuery = extendType({
       },
       resolve: async (_root, args, ctx) => {
         return await ctx.prisma.user.findUnique({ where: { id: Number(args.id) } });
+      },
+    });
+
+    t.field("myUserInfo", {
+      type: userObject,
+      resolve: async (_root, _args, ctx, _info) => {
+        if (!ctx.userContext.isAuthenticated || !ctx.userContext.user) throw Error(unauthorized);
+        return await ctx.prisma.user.findUnique({ where: { id: ctx.userContext.user.id } });
       },
     });
 
