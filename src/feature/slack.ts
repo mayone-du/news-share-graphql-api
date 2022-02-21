@@ -26,6 +26,13 @@ export const getSlackUserStatus = async (token: string, slackUserId: string) => 
 
 // Slackにニュースを投稿
 export const postNewsListToSlack = async () => {
-  // const res = slackApp.client.chat.postMessage({})
-  return;
+  try {
+    const chatPostMessageResponse = await slackApp.client.chat.postMessage({
+      channel: "#web-hook",
+      blocks: [{ type: "section", text: { type: "plain_text", text: "Hello world" } }],
+    });
+    return chatPostMessageResponse;
+  } catch (e) {
+    console.error(e);
+  }
 };

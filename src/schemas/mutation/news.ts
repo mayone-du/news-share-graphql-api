@@ -1,6 +1,7 @@
 import { arg, extendType, inputObjectType, list, nonNull } from "nexus";
 import { News } from "nexus-prisma";
 
+import { postNewsListToSlack } from "../../feature/slack";
 import { decodeId, fetchMetaFields } from "../../util";
 import { newsObject } from "../";
 import { unauthorized } from "../errors/messages";
@@ -51,6 +52,7 @@ export const newsMutation = extendType({
         // TODO: urlのバリデーション
         // TODO: ogpが存在しない場合にtitleタグやdescriptionタグが取得できない
         const metaFields = fetchMetaFields(args.input.url);
+        await postNewsListToSlack();
         return await ctx.prisma.news.create({
           data: {
             ...args.input,
