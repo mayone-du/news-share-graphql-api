@@ -53,6 +53,8 @@ https://www.figma.com/file/4LWxha4nR6rxTXBwZ4V6AF/Untitled?node-id=0%3A1
 - Rust 練習のために WASM 使う
 - バグ、機能追加の要望フォームとか、GitHub の URL もおいとく
 
+- GitHub Actions で Heroku の CI/CD 構築
+
 <!-- - サロンのカレンダーを取り込んで自動で延期？でもそうするとカレンダーの信用性とか色々必要になってくる -->
 <!-- - 別でサロンのカレンダーアプリ的なの会っても面白いかも。カレンダーつくれて Slack に投稿もできる -->
 <!-- - Google 認証実装したいから、運営＆自分のみ延期できるよう、メールアドレスとかハードコードして認証済みの人のみ Slack 通知できる -->

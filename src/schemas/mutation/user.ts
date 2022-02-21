@@ -6,10 +6,9 @@ import { getSlackUserStatus } from "../../feature/slack";
 import { userObject } from "../";
 import { unauthorized } from "../errors/messages";
 
-const updateUserInput = inputObjectType({
-  name: "UpdateUserInput",
+const updateMyUserInfoInput = inputObjectType({
+  name: "UpdateMyUserInfoInput",
   definition: (t) => {
-    t.nonNull.field(User.id);
     t.nullable.field(User.displayName);
     t.nullable.field(User.selfIntroduction);
   },
@@ -43,7 +42,7 @@ export const userMutation = extendType({
 
         // 初回ではない場合は、ユーザー情報を更新
         return await ctx.prisma.user.update({
-          where: { oauthUserId: ctx.userContext.user.oauthUserId },
+          where: { id: ctx.userContext.user.id },
           data: {
             displayName: slackUserStatus.profile?.display_name ?? "",
             signInCount: ctx.userContext.user.signInCount + 1,
@@ -52,13 +51,13 @@ export const userMutation = extendType({
       },
     });
 
-    t.field("updateUser", {
+    t.field("updateMyUserInfo", {
       type: userObject,
-      args: { input: nonNull(arg({ type: updateUserInput })) },
+      args: { input: nonNull(arg({ type: updateMyUserInfoInput })) },
       resolve: async (_root, args, ctx, _info) => {
         if (!ctx.userContext.isAuthenticated || !ctx.userContext.user) throw Error(unauthorized);
         return await ctx.prisma.user.update({
-          where: { oauthUserId: ctx.userContext.user.oauthUserId },
+          where: { id: ctx.userContext.user.id },
           data: {
             displayName: args.input.displayName ?? ctx.userContext.user.displayName,
             selfIntroduction: args.input.selfIntroduction ?? ctx.userContext.user.selfIntroduction,
