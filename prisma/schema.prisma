@@ -63,7 +63,7 @@ model News {
   sharedAt    DateTime @default(now()) // シェアする日。
   isViewed    Boolean  @default(false) // ニュースを読んだかどうか
   isImportant Boolean  @default(false) // 重要なニュース(是非見てほしいニュース)かどうか
-  like        Like[]
+  likes       Like[]
   user        User     @relation(fields: [userId], references: [id])
   userId      BigInt
 }
