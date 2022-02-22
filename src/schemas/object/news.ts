@@ -12,6 +12,8 @@ export const newsObject = objectType({
     t.field(News.description);
     t.field(News.imageUrl);
     t.field(News.url);
+    t.field(News.isViewed);
+    t.field(News.isImportant);
     t.field(News.createdAt);
     t.field(News.updatedAt);
     t.field(News.sharedAt);

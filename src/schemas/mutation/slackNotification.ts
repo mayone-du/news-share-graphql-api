@@ -1,7 +1,8 @@
 import { extendType } from "nexus";
 
+import { postNewsListToSlack } from "../../feature/slack";
 import { getOneDayBetween } from "../../util/date";
-import { unauthorized } from "../errors/messages";
+import { newsListIsEmpty, unauthorized } from "../errors/messages";
 import { slackNotificationObject } from "../object";
 
 export const slackNotificationMutation = extendType({
@@ -11,19 +12,25 @@ export const slackNotificationMutation = extendType({
     t.field("createSlackNotification", {
       type: slackNotificationObject,
       resolve: async (_root, _args, ctx, _info) => {
-        if (!ctx.userContext.isAuthenticated) throw Error(unauthorized);
-        const record = await ctx.prisma.slackNotification.create({ data: { isSent: true } });
-        const { yesterday, tomorrow } = getOneDayBetween(record.createdAt);
-
-        const todayNewsList = await ctx.prisma.news.findMany({
-          where: { sharedAt: { gt: yesterday, lt: tomorrow } },
-          orderBy: { sharedAt: "asc" },
-        });
-        const slackPayload = {};
-        // TODO: SlackのBlock Kitでいい感じに表示
-
-        // record.isSent && (await handleSubmitSlack(slackPayload));
-        return record;
+        if (!ctx.userContext.isAuthenticated || ctx.userContext.user?.role === "USER")
+          throw Error(unauthorized);
+        try {
+          const { yesterday, tomorrow } = getOneDayBetween(new Date());
+          const todayNewsList = await ctx.prisma.news.findMany({
+            where: { sharedAt: { gt: yesterday, lt: tomorrow } },
+            orderBy: { sharedAt: "asc" },
+          });
+          if (todayNewsList.length === 0) throw Error(newsListIsEmpty);
+          const chatPostMessageResponse = await postNewsListToSlack(todayNewsList);
+          if (!chatPostMessageResponse?.ok) throw Error(chatPostMessageResponse?.error);
+          const slackNotificationRecord = await ctx.prisma.slackNotification.create({
+            data: { isSent: chatPostMessageResponse.ok },
+          });
+          return slackNotificationRecord;
+        } catch (e) {
+          console.error(e);
+          return null;
+        }
       },
     });
   },

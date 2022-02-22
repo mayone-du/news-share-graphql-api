@@ -1,7 +1,6 @@
 import { arg, extendType, inputObjectType, list, nonNull } from "nexus";
 import { News } from "nexus-prisma";
 
-import { postNewsListToSlack } from "../../feature/slack";
 import { decodeId, fetchMetaFields } from "../../util";
 import { newsObject } from "../";
 import { unauthorized } from "../errors/messages";
@@ -21,6 +20,8 @@ const updateNewsInput = inputObjectType({
     t.nullable.string(News.title.name);
     t.nullable.string(News.description.name);
     t.nullable.datetime(News.sharedAt.name);
+    t.nullable.boolean(News.isViewed.name);
+    t.nullable.boolean(News.isImportant.name);
   },
 });
 
@@ -52,7 +53,6 @@ export const newsMutation = extendType({
         // TODO: urlのバリデーション
         // TODO: ogpが存在しない場合にtitleタグやdescriptionタグが取得できない
         const metaFields = fetchMetaFields(args.input.url);
-        await postNewsListToSlack();
         return await ctx.prisma.news.create({
           data: {
             ...args.input,
@@ -87,6 +87,8 @@ export const newsMutation = extendType({
             title: input.title ?? undefined,
             description: input.description ?? undefined,
             sharedAt: input.sharedAt ?? undefined,
+            isViewed: input.isViewed ?? undefined,
+            isImportant: input.isImportant ?? undefined,
           },
         });
       },
