@@ -1,4 +1,4 @@
-import { arg, extendType, inputObjectType, nonNull, nullable } from "nexus";
+import { arg, extendType, inputObjectType, nonNull } from "nexus";
 import { News } from "nexus-prisma";
 
 import { encodeId } from "../../util";
@@ -11,6 +11,15 @@ const newsListInput = inputObjectType({
     // t.field(News.sharedAt);
     // FIXME: 引数でDateTime型を受け取ると、フロントで無限ループのエラーになるため、StringでDate型を受け取り、パースして扱う
     t.nonNull.string(News.sharedAt.name);
+  },
+});
+
+const searchNewsListInput = inputObjectType({
+  name: "SearchNewsListInput",
+  definition(t) {
+    t.nullable.field(News.title);
+    t.nullable.field(News.description);
+    t.nullable.field(News.url);
   },
 });
 
@@ -52,17 +61,13 @@ export const newsQuery = extendType({
 
     t.nonNull.list.nonNull.field("searchNewsList", {
       type: newsObject,
-      args: {
-        [News.title.name]: nullable(News.title.type.ofNexusType),
-        [News.description.name]: nullable(News.description.type.ofNexusType),
-        [News.url.name]: nullable(News.url.type.ofNexusType),
-      },
+      args: { input: nonNull(arg({ type: searchNewsListInput })) },
       resolve: async (_root, args, ctx, _info) => {
         return await ctx.prisma.news.findMany({
           where: {
-            title: { search: args.title ?? undefined },
-            description: { search: args.description ?? undefined },
-            url: { search: args.url ?? undefined },
+            title: { search: args.input.title ?? undefined },
+            description: { search: args.input.description ?? undefined },
+            url: { search: args.input.url ?? undefined },
           },
         });
       },
