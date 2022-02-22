@@ -25,7 +25,7 @@ export const userObject = objectType({
     t.field(User.status.name, { type: statusEnum });
     t.field(User.createdAt);
     t.field(User.updatedAt);
-    // t.field(User.likes);
+    t.field(User.likes);
     t.field(User.newsList);
   },
 });

@@ -52,14 +52,19 @@ export const newsMutation = extendType({
         if (!ctx.userContext.isAuthenticated || !ctx.userContext.user) throw Error(unauthorized);
         // TODO: urlのバリデーション
         // TODO: ogpが存在しない場合にtitleタグやdescriptionタグが取得できない
-        const metaFields = fetchMetaFields(args.input.url);
-        return await ctx.prisma.news.create({
-          data: {
-            ...args.input,
-            ...metaFields,
-            userId: ctx.userContext.user.id,
-          },
-        });
+        try {
+          const metaFields = fetchMetaFields(args.input.url);
+          return await ctx.prisma.news.create({
+            data: {
+              ...args.input,
+              ...metaFields,
+              userId: ctx.userContext.user.id,
+            },
+          });
+        } catch (e) {
+          console.error(e);
+          return null;
+        }
       },
     });
 
