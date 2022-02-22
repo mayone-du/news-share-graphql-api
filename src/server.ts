@@ -5,7 +5,7 @@ import { schema } from "./schema";
 
 const server = new ApolloServer({
   cors: {
-    origin: "*",
+    origin: "*", // TODO: CORSの本番設定
     // credentials: true,
   },
   schema,
