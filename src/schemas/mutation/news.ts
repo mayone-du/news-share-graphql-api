@@ -19,7 +19,7 @@ const updateNewsInput = inputObjectType({
     t.nullable.string(News.url.name);
     t.nullable.string(News.title.name);
     t.nullable.string(News.description.name);
-    t.nullable.datetime(News.sharedAt.name);
+    t.nullable.string(News.sharedAt.name);
     t.nullable.boolean(News.isViewed.name);
     t.nullable.boolean(News.isImportant.name);
   },
@@ -91,7 +91,7 @@ export const newsMutation = extendType({
             url: input.url ?? undefined,
             title: input.title ?? undefined,
             description: input.description ?? undefined,
-            sharedAt: input.sharedAt ?? undefined,
+            sharedAt: input.sharedAt ? new Date(input.sharedAt) : undefined,
             isViewed: input.isViewed ?? undefined,
             isImportant: input.isImportant ?? undefined,
           },
