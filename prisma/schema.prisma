@@ -64,19 +64,21 @@ model News {
   isViewed    Boolean  @default(false) // ニュースを読んだかどうか
   isImportant Boolean  @default(false) // 重要なニュース(是非見てほしいニュース)かどうか
   likes       Like[]
-  user        User     @relation(fields: [userId], references: [id])
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId      BigInt
 }
 
 model Like {
   id        BigInt   @id @default(autoincrement())
-  newsId    BigInt   @unique
-  news      News     @relation(fields: [newsId], references: [id])
-  userId    BigInt   @unique
-  user      User     @relation(fields: [userId], references: [id])
+  newsId    BigInt
+  news      News     @relation(fields: [newsId], references: [id], onDelete: Cascade)
+  userId    BigInt
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   isLiked   Boolean  @default(true)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@unique([newsId, userId])
 }
 
 model SlackNotification {
