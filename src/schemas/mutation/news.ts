@@ -4,6 +4,7 @@ import { News } from "nexus-prisma";
 import { decodeId, fetchMetaFields } from "../../util";
 import { newsObject } from "../";
 import { unauthorized } from "../errors/messages";
+import dayjs from "dayjs";
 
 const createNewsInput = inputObjectType({
   name: "CreateNewsInput",
@@ -84,6 +85,12 @@ export const newsMutation = extendType({
           throw Error(unauthorized);
         // undefinedやnullの場合は更新せず、それ以外の場合は更新する
         const { input } = args;
+        // 引数でシェアする日時が指定され、かつ指定されたニュースが今日のものでなければエラー (過去のニュースとかは延期させたくない)
+        if (
+          input.sharedAt &&
+          dayjs().format("YYYY-MM-DD") !== dayjs(news?.sharedAt).format("YYYY-MM-DD")
+        )
+          throw Error("invalid date");
         // ニュースの作成者と運営のみ編集可能
         return await ctx.prisma.news.update({
           where: { id: decodedId },
