@@ -31,7 +31,7 @@ const postponeNewsListInput = inputObjectType({
   definition: (t) => {
     // nodeIdの配列を受け取る
     t.nonNull.list.nonNull.id("nodeIds");
-    t.nonNull.datetime(News.sharedAt.name);
+    t.nonNull.string(News.sharedAt.name); // DateTimeではなくStringで扱う
   },
 });
 
@@ -116,7 +116,7 @@ export const newsMutation = extendType({
         });
         await ctx.prisma.news.updateMany({
           where: { id: { in: decodedIds } },
-          data: { sharedAt: args.input.sharedAt },
+          data: { sharedAt: dayjs(args.input.sharedAt).toDate() },
         });
         const updatedNewsList = await ctx.prisma.news.findMany({
           where: { id: { in: decodedIds } },

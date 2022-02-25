@@ -17,7 +17,7 @@ export const slackNotificationMutation = extendType({
         try {
           const { yesterday, tomorrow } = getOneDayBetween(new Date());
           const todayNewsList = await ctx.prisma.news.findMany({
-            where: { sharedAt: { gt: yesterday, lt: tomorrow } },
+            where: { sharedAt: { gt: yesterday, lt: tomorrow }, isViewed: true },
             orderBy: { sharedAt: "asc" },
           });
           if (todayNewsList.length === 0) throw Error(newsListIsEmpty);

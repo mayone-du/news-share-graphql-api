@@ -87,3 +87,12 @@ model SlackNotification {
   createdAt DateTime @default(now()) // 送信日時
   updatedAt DateTime @updatedAt
 }
+
+// TODO: QinTV用のメモやニュースのテーブルを検討
+// model NewsMemo {
+//   id        BigInt   @id @default(autoincrement())
+//   newsId    BigInt   @unique
+//   News      News     @relation(fields: [newsId], references: [id], onDelete: Cascade)
+//   createdAt DateTime @default(now())
+//   updatedAt DateTime @updatedAt
+// }
