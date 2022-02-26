@@ -45,6 +45,7 @@ export const userMutation = extendType({
           where: { id: ctx.userContext.user.id },
           data: {
             displayName: slackUserStatus.profile?.display_name ?? "",
+            photoUrl: slackUserStatus.profile?.image_72 ?? "",
             signInCount: ctx.userContext.user.signInCount + 1,
           },
         });

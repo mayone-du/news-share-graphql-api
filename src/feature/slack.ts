@@ -31,15 +31,25 @@ export const postNewsListToSlack = async (newsList: News[]) => {
     const chatPostMessageResponse = await slackApp.client.chat.postMessage({
       channel: "#web-hook",
       // TODO: Slackで見やすくする
-      blocks: newsList.map((news) => {
-        return {
-          type: "section",
-          text: {
-            type: "mrkdwn",
-            text: `*<${news.url} | ${news.title || news.url}>*\n${news.description}`,
-          },
-        };
-      }),
+      blocks: newsList.length
+        ? newsList.map((news) => {
+            return {
+              type: "section",
+              text: {
+                type: "mrkdwn",
+                text: `*<${news.url} | ${news.title || news.url}>*\n${news.description}`,
+              },
+            };
+          })
+        : [
+            {
+              type: "section",
+              text: {
+                type: "mrkdwn",
+                text: "本日のニュースシェアはありません",
+              },
+            },
+          ],
     });
     return chatPostMessageResponse;
   } catch (e) {

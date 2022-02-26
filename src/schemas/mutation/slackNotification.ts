@@ -20,7 +20,6 @@ export const slackNotificationMutation = extendType({
             where: { sharedAt: { gt: yesterday, lt: tomorrow }, isViewed: true },
             orderBy: { sharedAt: "asc" },
           });
-          if (todayViewedNewsList.length === 0) throw Error(newsListIsEmpty);
           const chatPostMessageResponse = await postNewsListToSlack(todayViewedNewsList);
           if (!chatPostMessageResponse?.ok) throw Error(chatPostMessageResponse?.error);
           const slackNotificationRecord = await ctx.prisma.slackNotification.create({
