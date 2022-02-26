@@ -16,12 +16,12 @@ export const slackNotificationMutation = extendType({
           throw Error(unauthorized);
         try {
           const { yesterday, tomorrow } = getOneDayBetween(new Date());
-          const todayNewsList = await ctx.prisma.news.findMany({
+          const todayViewedNewsList = await ctx.prisma.news.findMany({
             where: { sharedAt: { gt: yesterday, lt: tomorrow }, isViewed: true },
             orderBy: { sharedAt: "asc" },
           });
-          if (todayNewsList.length === 0) throw Error(newsListIsEmpty);
-          const chatPostMessageResponse = await postNewsListToSlack(todayNewsList);
+          if (todayViewedNewsList.length === 0) throw Error(newsListIsEmpty);
+          const chatPostMessageResponse = await postNewsListToSlack(todayViewedNewsList);
           if (!chatPostMessageResponse?.ok) throw Error(chatPostMessageResponse?.error);
           const slackNotificationRecord = await ctx.prisma.slackNotification.create({
             data: { isSent: chatPostMessageResponse.ok },

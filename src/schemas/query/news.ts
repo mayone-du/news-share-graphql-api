@@ -25,6 +25,7 @@ const searchNewsListInput = inputObjectType({
 
 export const newsQuery = extendType({
   // TODO: nodeIdを受け取ってidを返すようにする
+  // TODO: 使用するIDの統一など
   type: "Query",
   definition(t) {
     t.field("news", {

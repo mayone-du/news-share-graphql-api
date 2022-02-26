@@ -116,7 +116,7 @@ export const newsMutation = extendType({
         });
         await ctx.prisma.news.updateMany({
           where: { id: { in: decodedIds } },
-          data: { sharedAt: dayjs(args.input.sharedAt).toDate() },
+          data: { sharedAt: new Date(args.input.sharedAt) },
         });
         const updatedNewsList = await ctx.prisma.news.findMany({
           where: { id: { in: decodedIds } },
