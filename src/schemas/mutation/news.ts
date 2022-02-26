@@ -1,4 +1,4 @@
-import { arg, extendType, inputObjectType, list, nonNull } from "nexus";
+import { arg, extendType, inputObjectType, list, nonNull, objectType } from "nexus";
 import { News } from "nexus-prisma";
 
 import { decodeId, fetchMetaFields } from "../../util";
@@ -127,7 +127,7 @@ export const newsMutation = extendType({
 
     // delete
     t.field("deleteNews", {
-      type: "Boolean",
+      type: newsObject,
       args: { input: nonNull(arg({ type: deleteNewsInput })) },
       resolve: async (_root, args, ctx, _info) => {
         if (!ctx.userContext.isAuthenticated || !ctx.userContext.user) throw Error(unauthorized);
@@ -140,10 +140,14 @@ export const newsMutation = extendType({
         if (ctx.userContext.user.id !== news?.userId && ctx.userContext.user.role === "USER")
           throw Error(unauthorized);
 
+        const deleteNews = await ctx.prisma.news.findUnique({
+          where: { id: decodedId },
+        });
+        if (!deleteNews) throw Error("News Not Found");
         await ctx.prisma.news.delete({
           where: { id: decodedId },
         });
-        return true;
+        return deleteNews;
       },
     });
   },
