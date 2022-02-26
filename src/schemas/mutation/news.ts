@@ -127,7 +127,7 @@ export const newsMutation = extendType({
 
     // delete
     t.field("deleteNews", {
-      type: newsObject,
+      type: "Boolean",
       args: { input: nonNull(arg({ type: deleteNewsInput })) },
       resolve: async (_root, args, ctx, _info) => {
         if (!ctx.userContext.isAuthenticated || !ctx.userContext.user) throw Error(unauthorized);
@@ -140,9 +140,10 @@ export const newsMutation = extendType({
         if (ctx.userContext.user.id !== news?.userId && ctx.userContext.user.role === "USER")
           throw Error(unauthorized);
 
-        return await ctx.prisma.news.delete({
+        await ctx.prisma.news.delete({
           where: { id: decodedId },
         });
+        return true;
       },
     });
   },
