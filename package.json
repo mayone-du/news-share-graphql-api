@@ -8,7 +8,7 @@
     "generate:prisma": "npx prisma generate",
     "studio:db": "npx prisma studio",
     "migrate:dev": "npx prisma migrate dev",
-    "migrate:prod": "npx prisma migrate prod",
+    "migrate:prod": "npx prisma migrate deploy",
     "napi:new": "napi new scraping"
   },
   "dependencies": {
