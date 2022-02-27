@@ -12,6 +12,7 @@ export const slackNotificationMutation = extendType({
     t.field("createSlackNotification", {
       type: slackNotificationObject,
       resolve: async (_root, _args, ctx, _info) => {
+        // TODO: トランザクションはってもいいかも
         if (!ctx.userContext.isAuthenticated || ctx.userContext.user?.role === "USER")
           throw Error(unauthorized);
         try {

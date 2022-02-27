@@ -10,16 +10,10 @@ const newsListInput = inputObjectType({
   definition(t) {
     // t.field(News.sharedAt);
     // FIXME: 引数でDateTime型を受け取ると、フロントで無限ループのエラーになるため、StringでDate型を受け取り、パースして扱う
-    t.nonNull.string(News.sharedAt.name);
-  },
-});
-
-const searchNewsListInput = inputObjectType({
-  name: "SearchNewsListInput",
-  definition(t) {
-    t.nullable.field(News.title);
-    t.nullable.field(News.description);
-    t.nullable.field(News.url);
+    t.nullable.string(News.sharedAt.name);
+    t.nullable.string(News.title.name);
+    t.nullable.string(News.description.name);
+    t.nullable.string(News.url.name);
   },
 });
 
@@ -43,32 +37,27 @@ export const newsQuery = extendType({
       args: { input: nonNull(arg({ type: newsListInput })) },
       resolve: async (_root, args, ctx, _info) => {
         // JSTではなくUTCで扱っているため注意
-        const date = new Date(args.input.sharedAt);
+        const date = new Date(args.input.sharedAt ?? new Date());
         const { yesterday, tomorrow } = getOneDayBetween(date);
         // 指定された日付のニュースを取得して返す
         return await ctx.prisma.news.findMany({
           where: {
-            sharedAt: {
-              gt: yesterday, // より上
-              lt: tomorrow, // より下
-            },
+            OR: [
+              {
+                sharedAt: args.input.sharedAt
+                  ? {
+                      gt: yesterday, // より上
+                      lt: tomorrow, // より下
+                    }
+                  : undefined,
+                title: { contains: args.input.title ?? undefined },
+                description: { contains: args.input.description ?? undefined },
+                url: { contains: args.input.url ?? undefined },
+              },
+            ],
           },
           orderBy: {
             createdAt: "asc",
-          },
-        });
-      },
-    });
-
-    t.nonNull.list.nonNull.field("searchNewsList", {
-      type: newsObject,
-      args: { input: nonNull(arg({ type: searchNewsListInput })) },
-      resolve: async (_root, args, ctx, _info) => {
-        return await ctx.prisma.news.findMany({
-          where: {
-            title: { search: args.input.title ?? undefined },
-            description: { search: args.input.description ?? undefined },
-            url: { search: args.input.url ?? undefined },
           },
         });
       },
