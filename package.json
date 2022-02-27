@@ -4,7 +4,7 @@
   "license": "MIT",
   "type": "module",
   "scripts": {
-    "start": "ts-node src/server.ts",
+    "start": "npx ts-node --transpile-only src/server.ts",
     "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
     "generate:prisma": "npx prisma generate",
     "studio:db": "npx prisma studio",
@@ -23,6 +23,8 @@
   },
   "devDependencies": {
     "@napi-rs/cli": "^2.4.2",
+    "@swc/core": "^1.2.146",
+    "@swc/helpers": "^0.3.6",
     "@types/jsonwebtoken": "^8.5.8",
     "@types/node": "^16.11.7",
     "@typescript-eslint/eslint-plugin": "^5.3.1",
