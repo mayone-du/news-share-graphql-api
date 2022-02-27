@@ -40,6 +40,7 @@ model User {
   likes            Like[]
   newsList         News[]
   // shortcuts        Shortcut[]
+  // Messages         Message[]
 }
 
 // model Shortcut {
@@ -57,7 +58,8 @@ model News {
   url         String // ニュースのURL
   title       String // タイトル
   description String // 概要
-  imageUrl    String? // サムネ用の画像URL
+  imageUrl    String // サムネ用の画像URL
+  faviconUrl  String // サイトアイコン用の画像URL
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   sharedAt    DateTime @default(now()) // シェアする日。
@@ -95,4 +97,15 @@ model SlackNotification {
 //   News      News     @relation(fields: [newsId], references: [id], onDelete: Cascade)
 //   createdAt DateTime @default(now())
 //   updatedAt DateTime @updatedAt
+// }
+
+// oViceのメッセージをどうにか複製
+// model Message {
+//   id        BigInt   @id @default(autoincrement())
+//   text      String
+//   hasAlreadyRead  Boolean  @default(false)
+//   createdAt DateTime @default(now())
+//   updatedAt DateTime @updatedAt
+//   userId    BigInt
+//   User      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 // }

@@ -11,6 +11,7 @@ export const newsObject = objectType({
     t.field(News.title);
     t.field(News.description);
     t.field(News.imageUrl);
+    t.field(News.faviconUrl);
     t.field(News.url);
     t.field(News.isViewed);
     t.field(News.isImportant);

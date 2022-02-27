@@ -9,6 +9,7 @@ pub struct MetaFields {
     pub title: String,
     pub description: String,
     pub image_url: String,
+    pub favicon_url: String,
 }
 
 #[tokio::main]
@@ -18,7 +19,7 @@ pub async fn fetch_meta_fields(url: String) -> Result<MetaFields, napi::Error> {
 
     let fragment = scraper::Html::parse_fragment(&body);
 
-    let (og_title_selector, og_description_selector, og_image_selector) = get_og_selectors();
+    let (og_title_selector, og_description_selector, og_image_selector, og_favicon_selector) = get_og_selectors();
     let meta_title_selector = scraper::Selector::parse("title").unwrap();
     let meta_description_selector =
         scraper::Selector::parse(r#"meta[property="description"]"#).unwrap();
@@ -27,6 +28,7 @@ pub async fn fetch_meta_fields(url: String) -> Result<MetaFields, napi::Error> {
         title: "".to_string(),
         description: "".to_string(),
         image_url: "".to_string(),
+        favicon_url: "".to_string(),
     };
 
     // title
@@ -68,15 +70,28 @@ pub async fn fetch_meta_fields(url: String) -> Result<MetaFields, napi::Error> {
         };
     }
 
+    // favicon
+    for element in fragment.select(&og_favicon_selector) {
+        meta_fields.favicon_url = match element.value().attr("href") {
+            Some(href) => href.to_string(),
+            None => "".to_string(),
+            // None => meta_fields.favicon_url.clone(),
+        };
+    }
+
+
+
+
     Ok(meta_fields)
 }
 
-fn get_og_selectors() -> (scraper::Selector, scraper::Selector, scraper::Selector) {
-    let (title, description, image) = ("title", "description", "image");
+fn get_og_selectors() -> (scraper::Selector, scraper::Selector, scraper::Selector, scraper::Selector) {
+    let (title, description, image, favicon) = ("title", "description", "image", "icon");
     // let selector_temp = r#"meta[property="og:{}"]"#;
     (
         scraper::Selector::parse(&format!(r#"meta[property="og:{}"]"#, title)).unwrap(),
         scraper::Selector::parse(&format!(r#"meta[property="og:{}"]"#, description)).unwrap(),
         scraper::Selector::parse(&format!(r#"meta[property="og:{}"]"#, image)).unwrap(),
+        scraper::Selector::parse(&format!(r#"link[rel*="{}"]"#, favicon)).unwrap(),
     )
 }
