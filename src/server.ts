@@ -12,7 +12,7 @@ const server = new ApolloServer({
   context,
 });
 
-server.listen().then(async ({ url }) => {
+server.listen({ port: process.env.PORT || 4000 }).then(async ({ url }) => {
   // eslint-disable-next-line no-console
   console.log(`\
 🚀 Server ready at: ${url}
