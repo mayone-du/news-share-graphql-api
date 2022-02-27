@@ -16,7 +16,7 @@
   },
   "scripts": {
     "artifacts": "napi artifacts",
-    "build": "napi build --platform --release",
+    "build": "OPENSSL_DIR=/usr/local/opt/openssl@1.1/bin/openssl && napi build --platform --release --target x86_64-unknown-linux-gnu",
     "build:debug": "napi build --platform",
     "prepublishOnly": "napi prepublish -t npm",
     "version": "napi version"

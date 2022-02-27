@@ -1,10 +1,20 @@
 import { arg, extendType, inputObjectType, list, nonNull, objectType } from "nexus";
 import { News } from "nexus-prisma";
 
-import { decodeId, fetchMetaFields } from "../../util";
+// import { decodeId, fetchMetaFields } from "../../util";
+import { decodeId } from "../../util";
 import { newsObject } from "../";
 import { unauthorized } from "../errors/messages";
 import dayjs from "dayjs";
+
+const fetchMetaFields = (url: string) => {
+  return {
+    title: "",
+    description: "",
+    imageUrl: "",
+    faviconUrl: "",
+  };
+};
 
 const createNewsInput = inputObjectType({
   name: "CreateNewsInput",
