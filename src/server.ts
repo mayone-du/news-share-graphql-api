@@ -5,8 +5,8 @@ import { schema } from "./schema";
 
 const server = new ApolloServer({
   cors: {
-    origin: "*", // Develop only
-    // origin: "https://news-share-web.vercel.app",
+    // origin: "*", // Develop only
+    origin: "https://news-share-web.vercel.app",
   },
   schema,
   context,

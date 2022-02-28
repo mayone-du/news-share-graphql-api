@@ -5,6 +5,7 @@ import { CROWN_EMOJI } from "../../constants/statusEmoji";
 import { getSlackUserStatus } from "../../feature/slack";
 import { userObject } from "../";
 import { unauthorized } from "../errors/messages";
+import { DEVELOPER_GMAIL, DEVELOPER_ICLOUD_EMAIL } from "../../constants/email";
 
 const updateMyUserInfoInput = inputObjectType({
   name: "UpdateMyUserInfoInput",
@@ -26,6 +27,9 @@ export const userMutation = extendType({
           ctx.userContext.token,
           ctx.userContext.slackAuthTestResponse.user_id ?? "",
         );
+        const isDeveloper =
+          slackUserStatus.profile?.email === DEVELOPER_ICLOUD_EMAIL ||
+          slackUserStatus.profile?.email === DEVELOPER_GMAIL;
         // 初回サインインの場合
         if (!ctx.userContext.user)
           return await ctx.prisma.user.create({
@@ -35,7 +39,12 @@ export const userMutation = extendType({
               email: slackUserStatus.profile?.email ?? "",
               displayName: slackUserStatus.profile?.display_name ?? "",
               selfIntroduction: slackUserStatus.profile?.status_text ?? "",
-              role: slackUserStatus.profile?.status_emoji === CROWN_EMOJI ? "ADMIN" : "USER",
+              role:
+                slackUserStatus.profile?.status_emoji === CROWN_EMOJI
+                  ? "ADMIN"
+                  : isDeveloper
+                  ? "DEVELOPER"
+                  : "USER",
               photoUrl: slackUserStatus.profile?.image_72 ?? "",
             },
           });
