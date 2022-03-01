@@ -1,12 +1,12 @@
 import { ApolloServer } from "apollo-server";
+import { isDev } from "./constants/envs";
 
 import { context } from "./context";
 import { schema } from "./schema";
 
 const server = new ApolloServer({
   cors: {
-    origin: "*", // TODO: 自動化 Develop only
-    // origin: "https://news-share-web.vercel.app",
+    origin: isDev ? "*" : "https://news-share-web.vercel.app",
   },
   schema,
   context,

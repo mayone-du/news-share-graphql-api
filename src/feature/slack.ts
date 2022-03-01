@@ -1,11 +1,11 @@
 import type { News } from "@prisma/client";
 import { App as SlackApp } from "@slack/bolt";
 
-import { DEV_SLACK_ENV_VARS } from "../constants/envs";
+import { SLACK_ENV_VARS } from "../constants/envs";
 
 const slackApp = new SlackApp({
-  signingSecret: DEV_SLACK_ENV_VARS.DEV_SLACK_SIGN_IN_SECRET,
-  token: DEV_SLACK_ENV_VARS.DEV_SLACK_BOT_OAUTH_TOKEN,
+  signingSecret: SLACK_ENV_VARS.SLACK_SIGN_IN_SECRET,
+  token: SLACK_ENV_VARS.SLACK_BOT_OAUTH_TOKEN,
 });
 
 // Slack認証情報の検証

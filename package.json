@@ -3,8 +3,8 @@
   "version": "1.0.0",
   "license": "MIT",
   "scripts": {
-    "start": "npx ts-node --transpile-only src/server.ts",
-    "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
+    "start": "NODE_ENV=production && npx ts-node --transpile-only src/server.ts",
+    "dev": "NODE_ENV=development && ts-node-dev --respawn --transpile-only src/server.ts",
     "generate:prisma": "npx prisma generate",
     "studio:db": "npx prisma studio",
     "migrate:dev": "npx prisma migrate dev",
