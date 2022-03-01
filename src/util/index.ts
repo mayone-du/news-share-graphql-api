@@ -1,2 +1,2 @@
-// export * from "../../scraping/index"; // TODO Rustのビルドが通らないからTSで実装
+// export * from "../../scraping/index"; // Heroku向け(Linuxターゲット)だとRustのビルドが通らないからTSで実装済み ローカルであれば既存ので動く
 export * from "./convert";

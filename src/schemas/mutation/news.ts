@@ -1,20 +1,11 @@
 import { arg, extendType, inputObjectType, list, nonNull, objectType } from "nexus";
 import { News } from "nexus-prisma";
 
-// import { decodeId, fetchMetaFields } from "../../util";
 import { decodeId } from "../../util";
 import { newsObject } from "../";
 import { unauthorized } from "../errors/messages";
 import dayjs from "dayjs";
-
-const fetchMetaFields = (url: string) => {
-  return {
-    title: "",
-    description: "",
-    imageUrl: "",
-    faviconUrl: "",
-  };
-};
+import { fetchMetaFields } from "../../feature/scraping";
 
 const createNewsInput = inputObjectType({
   name: "CreateNewsInput",
@@ -64,7 +55,7 @@ export const newsMutation = extendType({
         // TODO: urlのバリデーション
         // TODO: ogpが存在しない場合にtitleタグやdescriptionタグが取得できない
         try {
-          const metaFields = fetchMetaFields(args.input.url);
+          const metaFields = await fetchMetaFields(args.input.url);
           return await ctx.prisma.news.create({
             data: {
               ...args.input,
