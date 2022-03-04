@@ -10,7 +10,7 @@ const SLACK_CLIENT_SECRET = process.env.SLACK_CLIENT_SECRET ?? "";
 const SLACK_REDIRECT_URL = process.env.SLACK_REDIRECT_URL ?? "";
 const SLACK_SIGN_IN_SECRET = process.env.SLACK_SIGN_IN_SECRET ?? "";
 const SLACK_BOT_OAUTH_TOKEN = process.env.SLACK_BOT_OAUTH_TOKEN ?? "";
-const SLACK_CHANNEL_ID = process.env.SLACK_CHANNEL_ID ?? ""; // TODO: ここは実際のチャンネルIDに変更する
+const SLACK_CHANNEL_ID = process.env.SLACK_CHANNEL_ID ?? "";
 
 export const SLACK_ENV_VARS = {
   SLACK_CLIENT_ID,
@@ -18,4 +18,5 @@ export const SLACK_ENV_VARS = {
   SLACK_REDIRECT_URL,
   SLACK_SIGN_IN_SECRET,
   SLACK_BOT_OAUTH_TOKEN,
+  SLACK_CHANNEL_ID,
 } as const;

@@ -1,5 +1,5 @@
 import type { News } from "@prisma/client";
-import { App as SlackApp } from "@slack/bolt";
+import { App as SlackApp, Block, KnownBlock } from "@slack/bolt";
 
 import { SLACK_ENV_VARS } from "../constants/envs";
 
@@ -29,15 +29,19 @@ export const getSlackUserStatus = async (token: string, slackUserId: string) => 
 export const postNewsListToSlack = async (newsList: News[]) => {
   try {
     const chatPostMessageResponse = await slackApp.client.chat.postMessage({
-      channel: "#web-hook",
-      // TODO: Slackで見やすくする
+      channel: SLACK_ENV_VARS.SLACK_CHANNEL_ID,
       blocks: newsList.length
         ? newsList.map((news) => {
             return {
               type: "section",
               text: {
                 type: "mrkdwn",
-                text: `*<${news.url} | ${news.title || news.url}>*\n${news.description}`,
+                text: `*<${news.url} | ${news.title}>*\n${news.description}`,
+              },
+              accessory: {
+                type: "image",
+                image_url: news.imageUrl || "https://via.placeholder.com/150", // TODO: fallback用画像の準備
+                alt_text: news.title,
               },
             };
           })
