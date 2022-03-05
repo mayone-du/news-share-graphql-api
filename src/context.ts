@@ -18,6 +18,8 @@ export const context = async (ctx: ExpressContext): Promise<Context> => {
     const authorization = ctx.req.headers.authorization || "";
     if (!authorization) return { prisma, userContext: { isAuthenticated: false } }; // 認証情報がない場合
     const token = authorization.replace("Bearer ", "");
+    // TODO: 毎回slackAuthTestを実行すると、slackのAPIリクエストが多くなるので、
+    // TODO: 一度認証を行ったことがある場合は、それを利用する
     const authRes = await slackAuthTest(token);
     // 認証情報が正しいか確認
     const isAuthenticated = authRes.ok;
@@ -44,6 +46,7 @@ export const context = async (ctx: ExpressContext): Promise<Context> => {
     };
   } catch (e) {
     console.error("Unexpected Error in Context: ", e);
+    console.error(`Slackの権限: ${e?.response_metadata?.scopes?.join(",")}`);
     return { prisma, userContext: { isAuthenticated: false, error: e } };
   }
 };
