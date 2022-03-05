@@ -1,11 +1,11 @@
-import { arg, extendType, inputObjectType, list, nonNull, objectType } from "nexus";
+import dayjs from "dayjs";
+import { arg, extendType, inputObjectType, list, nonNull } from "nexus";
 import { News } from "nexus-prisma";
 
+import { fetchMetaFields } from "../../feature/scraping";
 import { decodeId } from "../../util";
 import { newsObject } from "../";
 import { unauthorized } from "../errors/messages";
-import dayjs from "dayjs";
-import { fetchMetaFields } from "../../feature/scraping";
 
 const createNewsInput = inputObjectType({
   name: "CreateNewsInput",
