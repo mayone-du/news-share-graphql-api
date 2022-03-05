@@ -46,7 +46,7 @@ export const context = async (ctx: ExpressContext): Promise<Context> => {
     };
   } catch (e) {
     console.error("Unexpected Error in Context: ", e);
-    console.error(`Slackの権限: ${e?.response_metadata?.scopes?.join(",")}`);
+    console.error(`Slackの権限: ${e?.data?.response_metadata?.scopes?.join(",")}`);
     return { prisma, userContext: { isAuthenticated: false, error: e } };
   }
 };
