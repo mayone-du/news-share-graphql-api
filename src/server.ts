@@ -1,6 +1,6 @@
 import { ApolloServer } from "apollo-server";
-import { isDev } from "./constants/envs";
 
+import { isDev } from "./constants/envs";
 import { context } from "./context";
 import { schema } from "./schema";
 

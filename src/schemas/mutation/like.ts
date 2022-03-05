@@ -64,6 +64,7 @@ export const likeMutation = extendType({
       resolve: async (_root, args, ctx, _info) => {
         if (!ctx.userContext.isAuthenticated || !ctx.userContext.user) throw Error(unauthorized);
         const likeRecord = await ctx.prisma.like.update({
+          // eslint-disable-next-line @typescript-eslint/naming-convention
           where: { newsId_userId: { newsId: args.input.newsId, userId: ctx.userContext.user.id } },
           data: { isLiked: !args.input.isLiked },
         });

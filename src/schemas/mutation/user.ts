@@ -1,11 +1,11 @@
 import { arg, extendType, inputObjectType, nonNull } from "nexus";
 import { User } from "nexus-prisma";
 
+import { DEVELOPER_GMAIL, DEVELOPER_ICLOUD_EMAIL } from "../../constants/email";
 import { CROWN_EMOJI } from "../../constants/statusEmoji";
 import { getSlackUserStatus } from "../../feature/slack";
 import { userObject } from "../";
 import { unauthorized } from "../errors/messages";
-import { DEVELOPER_GMAIL, DEVELOPER_ICLOUD_EMAIL } from "../../constants/email";
 
 const updateMyUserInfoInput = inputObjectType({
   name: "UpdateMyUserInfoInput",

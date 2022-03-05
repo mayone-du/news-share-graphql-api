@@ -4,6 +4,8 @@ dotenv.config();
 
 const NODE_ENV = process.env.NODE_ENV || "development";
 export const isDev = NODE_ENV === "development";
+// eslint-disable-next-line no-console
+console.log(`NODE_ENV: ${NODE_ENV}`);
 
 const SLACK_CLIENT_ID = process.env.SLACK_CLIENT_ID ?? "";
 const SLACK_CLIENT_SECRET = process.env.SLACK_CLIENT_SECRET ?? "";

@@ -1,5 +1,5 @@
 import type { News } from "@prisma/client";
-import { App as SlackApp, Block, KnownBlock } from "@slack/bolt";
+import { App as SlackApp } from "@slack/bolt";
 
 import { SLACK_ENV_VARS } from "../constants/envs";
 

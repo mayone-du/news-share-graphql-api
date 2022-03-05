@@ -1,7 +1,7 @@
 import { arg, extendType, inputObjectType, nonNull } from "nexus";
 import { User } from "nexus-prisma";
-import { encodeId } from "../../util";
 
+import { encodeId } from "../../util";
 import { unauthorized } from "../errors/messages";
 import { userObject } from "../object";
 

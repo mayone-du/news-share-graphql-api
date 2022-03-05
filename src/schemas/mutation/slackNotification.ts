@@ -2,7 +2,7 @@ import { extendType } from "nexus";
 
 import { postNewsListToSlack } from "../../feature/slack";
 import { getOneDayBetween } from "../../util/date";
-import { newsListIsEmpty, unauthorized } from "../errors/messages";
+import { unauthorized } from "../errors/messages";
 import { slackNotificationObject } from "../object";
 
 export const slackNotificationMutation = extendType({
