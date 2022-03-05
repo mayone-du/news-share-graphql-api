@@ -43,7 +43,7 @@ export const context = async (ctx: ExpressContext): Promise<Context> => {
       },
     };
   } catch (e) {
-    console.error(e);
+    console.error("Unexpected Error in Context: ", e);
     return { prisma, userContext: { isAuthenticated: false, error: e } };
   }
 };
