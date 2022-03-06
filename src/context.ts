@@ -24,9 +24,8 @@ export const context = async (ctx: ExpressContext): Promise<Context> => {
     // 認証情報が正しいか確認
     const isAuthenticated = authRes.ok;
     // 有効ではなかった場合
+    // NOTE: SlackのSDKの仕様上、エラーの場合はthrowされるため、殆どの場合でcatchにうつる
     if (!isAuthenticated) {
-      console.error(`Slackの権限: ${authRes.response_metadata?.scopes?.join(",")}`);
-      console.error(`エラーメッセージ: ${authRes.response_metadata?.messages}`);
       console.error(authRes.error);
       return { prisma, userContext: { isAuthenticated, error: authRes.error } };
     }
@@ -45,8 +44,6 @@ export const context = async (ctx: ExpressContext): Promise<Context> => {
       },
     };
   } catch (e) {
-    console.error("Unexpected Error in Context: ", e);
-    console.error(`Slackの権限: ${e?.data?.response_metadata?.scopes?.join(",")}`);
     return { prisma, userContext: { isAuthenticated: false, error: e } };
   }
 };

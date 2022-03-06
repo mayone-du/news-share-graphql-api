@@ -10,11 +10,7 @@ const slackApp = new SlackApp({
 
 // Slack認証情報の検証
 export const slackAuthTest = async (token: string) => {
-  console.log("slackAuthTest: ", token);
-  const authTestResponse = await slackApp.client.auth.test({
-    token,
-  });
-  console.log("authTestResponse: ", authTestResponse);
+  const authTestResponse = await slackApp.client.auth.test({ token });
   return authTestResponse;
 };
 
