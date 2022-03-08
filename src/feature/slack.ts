@@ -6,7 +6,7 @@ import { SLACK_ENV_VARS } from "../constants/envs";
 const slackApp = new SlackApp({
   signingSecret: SLACK_ENV_VARS.SLACK_SIGN_IN_SECRET,
   token: SLACK_ENV_VARS.SLACK_BOT_OAUTH_TOKEN,
-  scopes: ["chat.write", "users.read", "users.profile:read"],
+  // scopes: ["chat.write", "users.read", "users.profile:read"],
 });
 
 // Slack認証情報の検証

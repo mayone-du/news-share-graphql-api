@@ -16,11 +16,13 @@ const prisma = new PrismaClient();
 export const context = async (ctx: ExpressContext): Promise<Context> => {
   try {
     const authorization = ctx.req.headers.authorization || "";
+    console.log("authorization:", authorization);
     if (!authorization) return { prisma, userContext: { isAuthenticated: false } }; // 認証情報がない場合
     const token = authorization.replace("Bearer ", "");
     // TODO: 毎回slackAuthTestを実行すると、slackのAPIリクエストが多くなるので、
     // TODO: 一度認証を行ったことがある場合は、それを利用する
     const authRes = await slackAuthTest(token);
+    console.log("authRes:", authRes);
     // 認証情報が正しいか確認
     const isAuthenticated = authRes.ok;
     // 有効ではなかった場合
@@ -43,6 +45,7 @@ export const context = async (ctx: ExpressContext): Promise<Context> => {
       },
     };
   } catch (e) {
+    console.log("context error:", e);
     console.error(e);
     console.error(`Slackの権限: ${e?.data?.response_metadata?.scopes?.join(",")}`);
     return { prisma, userContext: { isAuthenticated: false, error: e } };
