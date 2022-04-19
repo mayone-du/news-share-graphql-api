@@ -23,29 +23,19 @@ export const userMutation = extendType({
       resolve: async (_root, args, ctx, _info) => {
         if (!ctx.userContext.isAuthenticated) throw Error(unauthorized);
         // 認証済みだが、ユーザーが存在しない場合(初回ログインの場合)はユーザーを作成
-        const slackUserStatus = await getSlackUserStatus(
-          ctx.userContext.token,
-          ctx.userContext.slackAuthTestResponse.user_id ?? "",
-        );
-        const isDeveloper =
-          slackUserStatus.profile?.email === DEVELOPER_ICLOUD_EMAIL ||
-          slackUserStatus.profile?.email === DEVELOPER_GMAIL;
+        // const isDeveloper =
+        //   slackUserStatus.profile?.email === DEVELOPER_ICLOUD_EMAIL ||
+        //   slackUserStatus.profile?.email === DEVELOPER_GMAIL;
         // 初回サインインの場合
         if (!ctx.userContext.user)
           return await ctx.prisma.user.create({
             data: {
-              oauthUserId: ctx.userContext.slackAuthTestResponse.user_id,
-              username: slackUserStatus.profile?.email ?? "",
-              email: slackUserStatus.profile?.email ?? "",
-              displayName: slackUserStatus.profile?.display_name ?? "",
-              selfIntroduction: slackUserStatus.profile?.status_text ?? "",
-              role:
-                slackUserStatus.profile?.status_emoji === CROWN_EMOJI
-                  ? "ADMIN"
-                  : isDeveloper
-                  ? "DEVELOPER"
-                  : "USER",
-              photoUrl: slackUserStatus.profile?.image_72 ?? "",
+              oauthUserId: ctx.userContext.tokenPayload.sub,
+              username: "todo",
+              email: "todo",
+              displayName: "todo",
+              selfIntroduction: "",
+              photoUrl: "",
             },
           });
 
@@ -53,8 +43,8 @@ export const userMutation = extendType({
         return await ctx.prisma.user.update({
           where: { id: ctx.userContext.user.id },
           data: {
-            displayName: slackUserStatus.profile?.display_name ?? "",
-            photoUrl: slackUserStatus.profile?.image_72 ?? "",
+            displayName: "",
+            photoUrl: "",
             signInCount: ctx.userContext.user.signInCount + 1,
           },
         });
