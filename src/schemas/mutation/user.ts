@@ -21,31 +21,35 @@ export const userMutation = extendType({
     t.field("authUser", {
       type: userObject,
       resolve: async (_root, args, ctx, _info) => {
-        if (!ctx.userContext.isAuthenticated) throw Error(unauthorized);
+        if (!ctx.userInfo.isAuthenticated) throw Error(unauthorized);
         // 認証済みだが、ユーザーが存在しない場合(初回ログインの場合)はユーザーを作成
-        // const isDeveloper =
-        //   slackUserStatus.profile?.email === DEVELOPER_ICLOUD_EMAIL ||
-        //   slackUserStatus.profile?.email === DEVELOPER_GMAIL;
+        const isDeveloper =
+          ctx.userInfo.payload.email === DEVELOPER_ICLOUD_EMAIL ||
+          ctx.userInfo.payload.email === DEVELOPER_GMAIL;
+        // TODO: 運営かどうかの判断(そもそもDBに持つ必要ない？Slackの情報もとにってだけでよいのでは説)
+        // const isAdmin = ctx.userInfo.
+
         // 初回サインインの場合
-        if (!ctx.userContext.user)
+        if (!ctx.userInfo.user)
           return await ctx.prisma.user.create({
             data: {
-              oauthUserId: ctx.userContext.tokenPayload.sub,
+              oauthUserId: ctx.userInfo.payload.sub,
               username: "todo",
               email: "todo",
               displayName: "todo",
               selfIntroduction: "",
               photoUrl: "",
+              role: isDeveloper ? "DEVELOPER" : "USER",
             },
           });
 
         // 初回ではない場合は、ユーザー情報を更新
         return await ctx.prisma.user.update({
-          where: { id: ctx.userContext.user.id },
+          where: { id: ctx.userInfo.user.id },
           data: {
             displayName: "",
             photoUrl: "",
-            signInCount: ctx.userContext.user.signInCount + 1,
+            signInCount: ctx.userInfo.user.signInCount + 1,
           },
         });
       },
@@ -55,12 +59,12 @@ export const userMutation = extendType({
       type: userObject,
       args: { input: nonNull(arg({ type: updateMyUserInfoInput })) },
       resolve: async (_root, args, ctx, _info) => {
-        if (!ctx.userContext.isAuthenticated || !ctx.userContext.user) throw Error(unauthorized);
+        if (!ctx.userInfo.isAuthenticated || !ctx.userInfo.user) throw Error(unauthorized);
         return await ctx.prisma.user.update({
-          where: { id: ctx.userContext.user.id },
+          where: { id: ctx.userInfo.user.id },
           data: {
-            displayName: args.input.displayName ?? ctx.userContext.user.displayName,
-            selfIntroduction: args.input.selfIntroduction ?? ctx.userContext.user.selfIntroduction,
+            displayName: args.input.displayName ?? ctx.userInfo.user.displayName,
+            selfIntroduction: args.input.selfIntroduction ?? ctx.userInfo.user.selfIntroduction,
           },
         });
       },

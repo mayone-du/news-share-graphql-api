@@ -28,8 +28,8 @@ export const userQuery = extendType({
     t.field("myUserInfo", {
       type: userObject,
       resolve: async (_root, _args, ctx, _info) => {
-        if (!ctx.userContext.isAuthenticated || !ctx.userContext.user) throw Error(unauthorized);
-        return await ctx.prisma.user.findUnique({ where: { id: ctx.userContext.user.id } });
+        if (!ctx.userInfo.isAuthenticated || !ctx.userInfo.user) throw Error(unauthorized);
+        return await ctx.prisma.user.findUnique({ where: { id: ctx.userInfo.user.id } });
       },
     });
 

@@ -1,7 +1,7 @@
 import type { User } from "@prisma/client";
 
 // TODO: 認証方法変えたので考える
-export type UserContext =
+export type UserInfo =
   | {
       // 認証成功時
       isAuthenticated: true;

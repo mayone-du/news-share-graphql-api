@@ -13,7 +13,7 @@ export const slackNotificationMutation = extendType({
       type: slackNotificationObject,
       resolve: async (_root, _args, ctx, _info) => {
         // TODO: トランザクションはってもいいかも
-        if (!ctx.userContext.isAuthenticated || ctx.userContext.user?.role === "USER")
+        if (!ctx.userInfo.isAuthenticated || ctx.userInfo.user?.role === "USER")
           throw Error(unauthorized);
         try {
           const { yesterday, tomorrow } = getOneDayBetween(new Date());

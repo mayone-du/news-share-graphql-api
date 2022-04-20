@@ -51,7 +51,7 @@ export const newsMutation = extendType({
       type: newsObject,
       args: { input: nonNull(arg({ type: createNewsInput })) },
       resolve: async (_root, args, ctx, _info) => {
-        if (!ctx.userContext.isAuthenticated || !ctx.userContext.user) throw Error(unauthorized);
+        if (!ctx.userInfo.isAuthenticated || !ctx.userInfo.user) throw Error(unauthorized);
         // TODO: urlのバリデーション
         // TODO: ogpが存在しない場合にtitleタグやdescriptionタグが取得できない
         try {
@@ -60,7 +60,7 @@ export const newsMutation = extendType({
             data: {
               ...args.input,
               ...metaFields,
-              userId: ctx.userContext.user.id,
+              userId: ctx.userInfo.user.id,
             },
           });
         } catch (e) {
@@ -75,14 +75,14 @@ export const newsMutation = extendType({
       type: newsObject,
       args: { input: nonNull(arg({ type: updateNewsInput })) },
       resolve: async (_root, args, ctx, _info) => {
-        if (!ctx.userContext.isAuthenticated || !ctx.userContext.user) throw Error(unauthorized);
+        if (!ctx.userInfo.isAuthenticated || !ctx.userInfo.user) throw Error(unauthorized);
         const decodedId = decodeId(args.input.nodeId).databaseId;
         // 自分のニュースかチェック
         const news = await ctx.prisma.news.findUnique({
           where: { id: decodedId },
         });
         // リクエストを送ったユーザーとニュースの作成者が違い、かつ、運営や開発者でない場合はエラー
-        if (ctx.userContext.user.id !== news?.userId && ctx.userContext.user.role === "USER")
+        if (ctx.userInfo.user.id !== news?.userId && ctx.userInfo.user.role === "USER")
           throw Error(unauthorized);
         // undefinedやnullの場合は更新せず、それ以外の場合は更新する
         const { input } = args;
@@ -131,14 +131,14 @@ export const newsMutation = extendType({
       type: newsObject,
       args: { input: nonNull(arg({ type: deleteNewsInput })) },
       resolve: async (_root, args, ctx, _info) => {
-        if (!ctx.userContext.isAuthenticated || !ctx.userContext.user) throw Error(unauthorized);
+        if (!ctx.userInfo.isAuthenticated || !ctx.userInfo.user) throw Error(unauthorized);
         const decodedId = decodeId(args.input.nodeId).databaseId;
         // 自分のニュースかチェック
         const news = await ctx.prisma.news.findUnique({
           where: { id: decodedId },
         });
         // リクエストを送ったユーザーとニュースの作成者が違い、かつ、運営や開発者でない場合はエラー
-        if (ctx.userContext.user.id !== news?.userId && ctx.userContext.user.role === "USER")
+        if (ctx.userInfo.user.id !== news?.userId && ctx.userInfo.user.role === "USER")
           throw Error(unauthorized);
 
         const deleteNews = await ctx.prisma.news.findUnique({
