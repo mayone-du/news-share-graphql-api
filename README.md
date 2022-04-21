@@ -93,3 +93,9 @@ npm run dev
 https://api.slack.com/apps/A032UTELZ6E?created=1
 
 https://github.com/dotansimha/graphql-code-generator/issues/7565
+
+### deploy
+
+```bash:terminal
+git push heroku main
+```
