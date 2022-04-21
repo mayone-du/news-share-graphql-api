@@ -70,7 +70,7 @@ export const newsMutation = extendType({
       },
     });
 
-    // update 運営の人しか更新不可
+    // update 運営の人か、投稿者でないと更新不可
     t.field("updateNews", {
       type: newsObject,
       args: { input: nonNull(arg({ type: updateNewsInput })) },

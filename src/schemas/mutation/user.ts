@@ -26,20 +26,22 @@ export const userMutation = extendType({
         const isDeveloper =
           ctx.userInfo.payload.email === DEVELOPER_ICLOUD_EMAIL ||
           ctx.userInfo.payload.email === DEVELOPER_GMAIL;
-        // TODO: 運営かどうかの判断(そもそもDBに持つ必要ない？Slackの情報もとにってだけでよいのでは説)
-        // const isAdmin = ctx.userInfo.
+        const slackUserStatus = await getSlackUserStatus(ctx.userInfo.payload.sub);
+        const isAdmin = slackUserStatus.profile?.status_emoji === CROWN_EMOJI;
+        if (!slackUserStatus.ok) throw Error("");
+        const email = slackUserStatus.profile?.email ?? ctx.userInfo.payload.email;
 
         // 初回サインインの場合
         if (!ctx.userInfo.user)
           return await ctx.prisma.user.create({
             data: {
               oauthUserId: ctx.userInfo.payload.sub,
-              username: "todo",
-              email: "todo",
-              displayName: "todo",
+              username: slackUserStatus.profile?.real_name ?? email,
+              email,
+              displayName: slackUserStatus.profile?.display_name ?? ctx.userInfo.payload.given_name,
               selfIntroduction: "",
               photoUrl: "",
-              role: isDeveloper ? "DEVELOPER" : "USER",
+              role: isDeveloper ? "DEVELOPER" : isAdmin ? "ADMIN" : "USER",
             },
           });
 
@@ -47,8 +49,8 @@ export const userMutation = extendType({
         return await ctx.prisma.user.update({
           where: { id: ctx.userInfo.user.id },
           data: {
-            displayName: "",
-            photoUrl: "",
+            displayName: slackUserStatus.profile?.display_name ?? ctx.userInfo.payload.name,
+            photoUrl: ctx.userInfo.payload.picture,
             signInCount: ctx.userInfo.user.signInCount + 1,
           },
         });

@@ -6,15 +6,6 @@ import { SLACK_ENV_VARS } from "../constants/envs";
 const slackApp = new SlackApp({
   signingSecret: SLACK_ENV_VARS.SLACK_SIGN_IN_SECRET,
   token: SLACK_ENV_VARS.SLACK_BOT_OAUTH_TOKEN,
-  // scopes: [
-  //   "identify",
-  //   "users:read",
-  //   "users.profile:read",
-  //   "chat:write",
-  //   "openid",
-  //   "email",
-  //   "profile",
-  // ], // TODO: 必要か調べる
 });
 
 // Slack認証情報の検証
@@ -24,9 +15,9 @@ export const slackAuthTest = async (token: string) => {
 };
 
 // Slackプロフィールのステータスを取得する
-export const getSlackUserStatus = async (token: string, slackUserId: string) => {
+export const getSlackUserStatus = async (slackUserId: string) => {
   const slackUserStatus = await slackApp.client.users.profile.get({
-    token,
+    token: SLACK_ENV_VARS.SLACK_BOT_OAUTH_TOKEN,
     user: slackUserId,
   });
   return slackUserStatus;
