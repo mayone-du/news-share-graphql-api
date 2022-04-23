@@ -40,7 +40,7 @@ export const userMutation = extendType({
               email,
               displayName: slackUserStatus.profile?.display_name ?? ctx.userInfo.payload.given_name,
               selfIntroduction: "",
-              photoUrl: "",
+              photoUrl: slackUserStatus.profile?.image_192 ?? ctx.userInfo.payload.picture,
               role: isDeveloper ? "DEVELOPER" : isAdmin ? "ADMIN" : "USER",
             },
           });
